@@ -15,9 +15,9 @@ def fibonacci(n, m):
 
 def main(argv):
     with open(argv[0]) as file:
-        n, k = file.readline().strip().split()
+        n, k = [int(item) for item in file.readline().split()]
 
-        print fibonacci(int(n), int(k))
+        print fibonacci(n, k)
 
 
 if __name__ == "__main__":

@@ -2,12 +2,12 @@ import sys
 import math
 
 
-def combinations(r, n):
+def combinations(n, r):
     return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
 
 
-def probability(r, n):
-    return combinations(r, n) * (0.25 ** r) * (0.75 ** (n - r))
+def probability(n, r):
+    return combinations(n, r) * (0.25 ** r) * (0.75 ** (n - r))
 
 
 def main(argv):
@@ -16,7 +16,7 @@ def main(argv):
 
         total = 2 ** k
 
-        print '%0.3f' % (sum([probability(n, total) for n in xrange(N, total + 1)]))
+        print '%0.3f' % (sum([probability(total, n) for n in xrange(N, total + 1)]))
 
 
 if __name__ == "__main__":
