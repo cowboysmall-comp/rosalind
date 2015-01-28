@@ -15,7 +15,7 @@ def read_fasta(file_path):
 
 
 def main(argv):
-    rna   = read_fasta(argv[0])
+    rna = read_fasta(argv[0])
 
     print math.factorial(rna.count('A')) * math.factorial(rna.count('C'))
 
