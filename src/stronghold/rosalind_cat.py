@@ -65,11 +65,12 @@ def matchings(rna, start, end, A):
 
 def main(argv):
     rna = read_fasta(argv[0])
+    N   = len(rna)
 
-    A = np.empty((len(rna), len(rna)), dtype = int)
+    A = np.empty((N, N), dtype = int)
     A.fill(-1)
 
-    print matchings(rna, 0, len(rna) - 1, A)
+    print matchings(rna, 0, N - 1, A)
 
 
 if __name__ == "__main__":
