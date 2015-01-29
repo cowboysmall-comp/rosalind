@@ -65,7 +65,7 @@ import sys
         def matchings(rna, A):
             if len(rna) == 0:
                 return 1
-            if rna not in A:
+            elif rna not in A:
                 A[rna] = 0
                 if check_occurences(rna):
                     for i in xrange(1, len(rna), 2):
@@ -125,7 +125,7 @@ def matchings(rna):
     def match(rna):
         if len(rna) == 0:
             return 1
-        if rna not in A:
+        elif rna not in A:
             A[rna] = 0
             if check_occurences(rna):
                 for i in xrange(1, len(rna), 2):
