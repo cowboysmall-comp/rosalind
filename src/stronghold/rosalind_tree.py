@@ -16,8 +16,8 @@ def read_graph(file_path):
 
 
 def main(argv):
-    n, edges  = read_graph(argv[0])
-    uf        = unionfind.UnionFind(n)
+    n, edges = read_graph(argv[0])
+    uf       = unionfind.UnionFind(n)
 
     for edge in edges:
         uf.union(edge[0], edge[1])
