@@ -3,15 +3,15 @@ import math
 
 
 def read_fasta(file_path):
-    dna = ''
+    rna = ''
 
     with open(file_path) as file:
         for line in file:
             line = line.strip()
             if not line.startswith('>'):
-                dna += line
+                rna += line
 
-    return dna
+    return rna
 
 
 def main(argv):
