@@ -31,11 +31,7 @@ def composition(a, b):
 
 
 def count_breaks(perm):
-    perm = perm[:]
-
-    perm.insert(0, min(perm) - 1)
-    perm.append(max(perm) + 1)
-
+    perm  = [min(perm) - 1] + perm + [max(perm) + 1]
     count = 0
 
     for i in xrange(len(perm) - 1):
@@ -68,7 +64,7 @@ def generate_reversals(perm):
             yield perm[:i] + perm[i:j + 1][::-1] + perm[j + 1:]
 
 
-def reversal_length(perm):
+def reversal_count(perm):
     visited  = set()
     visited.add(tuple(perm))
 
@@ -98,7 +94,7 @@ def main(argv):
     D     = []
 
     for perm in perms:
-        D.append(reversal_length(perm))
+        D.append(reversal_count(perm))
 
     print ' '.join(str(d) for d in D)
 

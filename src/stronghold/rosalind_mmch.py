@@ -19,7 +19,7 @@ def permutations(n, k):
 
 
 def main(argv):
-    rna = read_fasta(argv[0])
+    rna    = read_fasta(argv[0])
 
     au_max = max(rna.count('A'), rna.count('U'))
     au_min = min(rna.count('A'), rna.count('U'))
