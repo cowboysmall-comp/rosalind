@@ -7,7 +7,9 @@ import strings
 
 
 def main(argv):
-    print strings.longest_common_substring(fasta.read(argv[0]).values())
+    dna_strings = fasta.read(argv[0]).values()
+
+    print strings.longest_common_substring(dna_strings)
 
 
 if __name__ == "__main__":

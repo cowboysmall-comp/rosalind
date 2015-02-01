@@ -1,23 +1,15 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def fibonacci(n, m):
-    fib = [1, 1, 1]
-
-    for _ in xrange(2, n):
-        if len(fib) - 1 < m:
-            fib.append(fib[-1] + fib[-2])
-        else:
-            fib.append(fib[-1] + fib[-2] - fib[-m - 1])
-
-    return fib[n]
+import combs
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n, k = [int(item) for item in file.readline().split()]
+    n, m = files.read_line_of_ints(argv[0])
 
-        print fibonacci(n, k)
+    print combs.fibonacci_with_mortality(n, m)
 
 
 if __name__ == "__main__":

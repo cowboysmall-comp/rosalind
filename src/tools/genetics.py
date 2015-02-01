@@ -1,3 +1,8 @@
+import re
+
+from collections import defaultdict
+from itertools   import product
+
 
 """
     Here are some earlier (and alternative) versions of the perfect 
@@ -107,6 +112,15 @@ DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
 
 
+def dna_count(string):
+    symbols = defaultdict(int)
+
+    for character in string:
+        symbols[character] += 1    
+
+    return symbols
+
+
 def dna_complement(string):
     dna = []
 
@@ -126,6 +140,29 @@ def dna_to_rna(string):
             rna_string.append(character)
 
     return ''.join(rna_string)
+
+
+def gc_contents(strings):
+    contents = []
+
+    for label, string in strings.iteritems():
+        contents.append((label, gc_content(string)))
+
+    return contents
+
+
+def gc_content(string):
+    return 100 * float(string.count('G') + string.count('C')) / len(string)
+
+
+def kmer_composition(string, alpha, k):
+    kmers = [''.join(p) for p in product(*[alpha] * k)]
+
+    A = []
+    for kmer in kmers:
+        A.append(len(re.findall(r'(?=(%s))' % kmer, string)))
+
+    return A
 
 
 def check_occurences(rna):
@@ -181,3 +218,23 @@ def encode_protein(rna, table):
             break
 
     return encode
+
+
+def protein_weight(protein, table):
+    total = 0.0
+
+    for p in protein:
+        total += table[p]
+
+    return total
+
+
+def count_rnas_from_protein(protein, table):
+    total = 3
+
+    for c in protein:
+        total *= table[c]
+        total %= 1000000
+
+    return total
+

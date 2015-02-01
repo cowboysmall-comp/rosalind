@@ -36,6 +36,24 @@ from itertools import combinations
 '''
 
 
+def failure_array(string):
+    N   = len(string)
+    T   = [0] * N
+
+    pos = 1
+    idx = 0
+    while pos < N:
+        if string[pos] == string[idx]:
+            idx   += 1
+            T[pos] = idx
+            pos   += 1
+        elif idx > 0:
+            idx    = T[idx - 1]
+        else:
+            pos   += 1
+
+    return T
+
 
 def longest_subsequence(seq, increasing = True):
     sub = []

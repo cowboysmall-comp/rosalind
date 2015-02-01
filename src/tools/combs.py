@@ -9,6 +9,27 @@ def permutations(n, r):
     return math.factorial(n) / math.factorial(n - r)
 
 
+def fibonacci_with_reproduction(n, k):
+    fib = [1, 1]
+
+    for _ in xrange(2, n):
+        fib.append(fib[-1] + (fib[-2] * k))
+
+    return fib[n - 1]
+
+
+def fibonacci_with_mortality(n, m):
+    fib = [1, 1, 1]
+
+    for _ in xrange(2, n):
+        if len(fib) - 1 < m:
+            fib.append(fib[-1] + fib[-2])
+        else:
+            fib.append(fib[-1] + fib[-2] - fib[-m - 1])
+
+    return fib[n]
+
+
 def enumerate_signed_permutations(values):
     if values:
         perms = []

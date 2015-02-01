@@ -45,3 +45,14 @@ def tt_ratio(s, t):
 
     return transition / transversion
 
+
+def p_matrix(strings):
+    N   = len(strings)
+    D   = [[0.0 for _ in xrange(N)] for _ in xrange(N)]
+
+    for i in xrange(N):
+        for j in xrange(i + 1, N):
+            D[i][j] = p(strings[i], strings[j])
+            D[j][i] = D[i][j]
+
+    return D

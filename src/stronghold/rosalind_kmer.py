@@ -3,18 +3,12 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import fasta
-import re
-
-from itertools import product
+import genetics
 
 
 def main(argv):
-    dna   = fasta.read_one(argv[0])
-    kmers = [''.join(p) for p in product(*[['A', 'C', 'G', 'T']] * 4)]
-
-    A = []
-    for kmer in kmers:
-        A.append(len(re.findall(r'(?=(%s))' % kmer, dna)))
+    dna = fasta.read_one(argv[0])
+    A   = genetics.kmer_composition(dna, ['A', 'C', 'G', 'T'], 4)
 
     print ' '.join(str(a) for a in A)
 

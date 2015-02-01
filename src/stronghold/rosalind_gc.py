@@ -3,27 +3,15 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import fasta
-
-
-def gc_content(strings):
-    max_count = 0
-    max_label = None
-
-    for label, string in strings.iteritems():
-        count = 100 * float(string.count('G') + string.count('C')) / len(string)
-        if max_count < count:
-            max_count = count
-            max_label = label
-
-    return max_count, max_label
+import genetics
 
 
 def main(argv):
-    strings      = fasta.read(argv[0])
-    count, label = gc_content(strings)
+    strings = fasta.read(argv[0])
+    highest = max(genetics.gc_contents(strings), key = lambda x: x[1])
 
-    print label
-    print '%0.6f' % (count)
+    print highest[0]
+    print '%0.6f' % (highest[1])
 
 
 if __name__ == "__main__":

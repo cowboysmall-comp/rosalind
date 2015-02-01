@@ -1,20 +1,15 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def fibonacci(n, k):
-    fib = [1, 1]
-
-    for _ in xrange(2, n):
-        fib.append(fib[-1] + (fib[-2] * k))
-
-    return fib[n - 1]
+import combs
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n, k = file.readline().strip().split()
+    n, k = files.read_line_of_ints(argv[0])
 
-        print fibonacci(int(n), int(k))
+    print combs.fibonacci_with_reproduction(n, k)
 
 
 if __name__ == "__main__":
