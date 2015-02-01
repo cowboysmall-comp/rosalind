@@ -1,35 +1,26 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from collections import defaultdict
-
-
-def reverse_codon_table(file_path):
-    table = defaultdict(int)
-
-    with open(file_path) as file:
-        for line in file:
-            items = line.strip().split()
-            for key, value in zip(*[iter(items)] * 2):
-                table[value] +=1
-
-    return table
+import tables
+import files
 
 
-def calculate_total(file_path, table):
+def calculate_total(string, table):
     total = 3
 
-    with open(file_path) as file:
-        for c in file.readline().strip():
-            total *= table[c]
-            total %= 1000000
+    for c in string:
+        total *= table[c]
+        total %= 1000000
 
     return total
 
 
 def main(argv):
-    table = reverse_codon_table(argv[0])
+    table  = tables.reverse_codon(argv[0])
+    string = files.read_line(argv[1])
 
-    print calculate_total(argv[1], table)
+    print calculate_total(string, table)
 
 
 if __name__ == "__main__":

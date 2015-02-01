@@ -1,20 +1,13 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
-
-def dna_complement(string):
-    dna = []
-
-    for character in string:
-        dna.append(COMPLEMENT[character])
-
-    return ''.join(dna[::-1])
+import genetics
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        print dna_complement(file.readline().strip())
+    print genetics.dna_complement(files.read_line(argv[0]))
 
 
 if __name__ == "__main__":

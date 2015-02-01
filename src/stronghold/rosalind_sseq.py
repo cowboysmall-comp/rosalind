@@ -1,36 +1,25 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from collections import defaultdict
+import fasta
 
 
-def read_fasta(file_path):
-    strings = defaultdict(str)
-    labels  = []
+def find_indices(s, t):
+    indices = []
+    pos     = 0
 
-    with open(file_path) as file:
-        label = None
-        for line in file:
-            line = line.strip()
-            if line.startswith('>'):
-                label = line[1:]
-                labels.append(label)
-            else:
-                strings[label] += line
+    for c in t:
+        pos = s.find(c, pos) + 1
+        indices.append(pos)
 
-    return strings[labels[0]], strings[labels[1]]
+    return indices
 
 
 def main(argv):
-    s, t = read_fasta(argv[0])
+    s, t = fasta.read_ordered(argv[0])
 
-    indices  = []
-    position = 0
-
-    for c in t:
-        position = s.find(c, position) + 1
-        indices.append(position)
-
-    print ' '.join([str(i) for i in indices])
+    print ' '.join([str(i) for i in find_indices(s, t)])
 
 
 if __name__ == "__main__":

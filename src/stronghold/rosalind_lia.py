@@ -1,22 +1,20 @@
+import os
 import sys
-import math
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def combinations(n, r):
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+import combs
+import files
 
 
 def probability(n, r):
-    return combinations(n, r) * (0.25 ** r) * (0.75 ** (n - r))
+    return combs.combinations(n, r) * (0.25 ** r) * (0.75 ** (n - r))
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        k, N = [int(i) for i in file.readline().split()]
+    k, N  = files.read_line_of_ints(argv[0])
+    total = 2 ** k
 
-        total = 2 ** k
-
-        print '%0.3f' % (sum([probability(total, n) for n in xrange(N, total + 1)]))
+    print '%0.3f' % (sum([probability(total, n) for n in xrange(N, total + 1)]))
 
 
 if __name__ == "__main__":

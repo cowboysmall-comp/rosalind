@@ -1,12 +1,8 @@
+import os
 import sys
-import math
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def gc_probabilty(string, gc):
-    count_gc = string.count('G') + string.count('C')
-    count_at = string.count('A') + string.count('T')
-
-    return ((gc / 2.0) ** count_gc) * (((1 - gc) / 2.0) ** count_at)
+import probs
 
 
 def main(argv):
@@ -15,7 +11,7 @@ def main(argv):
         N, gc = int(items[0]), float(items[1])
         dna   = file.readline().strip()
 
-        print '%0.3f' % (1 - ((1 - gc_probabilty(dna, gc)) ** N))
+        print '%0.3f' % ( 1 - ( ( 1 - probs.gc(dna, gc) ) ** N ) )
 
 
 if __name__ == "__main__":

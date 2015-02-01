@@ -1,33 +1,25 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
+
+import tables
+import files
 
 
-def mass_table(file_path):
-    table = {}
-
-    with open(file_path) as file:
-        for line in file:
-            key, value = line.strip().split()
-            table[key] = float(value)
-
-    return table
-
-
-def calculate_weight(file_path, table):
+def calculate_weight(protein, table):
     total = 0.0
 
-    with open(file_path) as file:
-        line = file.readline().strip()
-        for c in line:
-            total += table[c]
+    for p in protein:
+        total += table[p]
 
     return total
 
 
-
 def main(argv):
-    table = mass_table(argv[0])
+    table   = tables.mass(argv[0])
+    protein = files.read_line(argv[1])
 
-    print '%0.3f' % (calculate_weight(argv[1], table))
+    print '%0.3f' % (calculate_weight(protein, table))
 
 
 if __name__ == "__main__":

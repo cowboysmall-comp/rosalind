@@ -1,16 +1,15 @@
+import os
 import sys
-import math
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def permutations(n, k):
-    return math.factorial(n) / math.factorial(n - k)
+import combs
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n, k = file.readline().strip().split()
+    n, k = files.read_line_of_ints(argv[0])
 
-        print permutations(int(n), int(k)) % 1000000
+    print combs.permutations(n, k) % 1000000
 
 
 if __name__ == "__main__":

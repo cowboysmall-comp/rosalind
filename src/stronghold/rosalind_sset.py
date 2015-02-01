@@ -1,11 +1,14 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
+
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        N = int(file.readline().strip())
+    N = files.read_int(argv[0])
 
-        print (2 ** N) % 1000000
+    print pow(2, N, 1000000)
 
 
 if __name__ == "__main__":

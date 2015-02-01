@@ -1,21 +1,8 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from collections import defaultdict
-
-
-def read_fasta(file_path):
-    strings = defaultdict(str)
-
-    with open(file_path) as file:
-        label = None
-        for line in file:
-            line = line.strip()
-            if line.startswith('>'):
-                label = line[1:]
-            else:
-                strings[label] += line
-
-    return strings
+import fasta
 
 
 def create_nodes(strings):
@@ -38,7 +25,7 @@ def create_edges(nodes):
 
 
 def main(argv):
-    strings = read_fasta(argv[0])
+    strings = fasta.read(argv[0])
     nodes   = create_nodes(strings)
     edges   = create_edges(nodes)
 

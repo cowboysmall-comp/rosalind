@@ -1,16 +1,8 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def read_fasta(file_path):
-    dna = ''
-
-    with open(file_path) as file:
-        for line in file:
-            line = line.strip()
-            if not line.startswith('>'):
-                dna += line
-
-    return dna
+import fasta
 
 
 def compute_kmp(dna):
@@ -33,7 +25,7 @@ def compute_kmp(dna):
 
 
 def main(argv):
-    dna = read_fasta(argv[0])
+    dna = fasta.read_one(argv[0])
 
     print ' '.join(str(entry) for entry in compute_kmp(dna))
 

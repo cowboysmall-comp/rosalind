@@ -64,7 +64,7 @@ def generate_reversals(perm):
             yield perm[:i] + perm[i:j + 1][::-1] + perm[j + 1:]
 
 
-def reversal_count(perm):
+def reversal_sort(perm):
     visited  = set()
     visited.add(tuple(perm))
 
@@ -74,17 +74,22 @@ def reversal_count(perm):
     count    = 0
 
     while IDENTITY not in visited:
-        temp = []
+        count += 1
+
+        temp   = []
         for perm in queue:
             for reversal in generate_reversals(perm):
                 rev = tuple(reversal)
+
+                if rev == IDENTITY:
+                    return count
+
                 if rev not in visited:
                     visited.add(rev)
                     temp.append(reversal)
 
         breaks = get_breaks(temp)
         queue  = prune_perms(temp, breaks)
-        count += 1
 
     return count
 
@@ -94,7 +99,7 @@ def main(argv):
     D     = []
 
     for perm in perms:
-        D.append(reversal_count(perm))
+        D.append(reversal_sort(perm))
 
     print ' '.join(str(d) for d in D)
 

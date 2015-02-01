@@ -1,16 +1,15 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def hamming_distance(s, t):
-    return sum(x != y for x, y in zip(s, t))
+import distance
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        s = file.readline().strip()
-        t = file.readline().strip()
+    s, t = files.read_lines(argv[0])
 
-        print hamming_distance(s, t)
+    print distance.hamming(s, t)
 
 
 if __name__ == "__main__":

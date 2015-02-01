@@ -1,23 +1,15 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
+
+import fasta
 import re
 
 from itertools import product
 
 
-def read_fasta(file_path):
-    dna = ''
-
-    with open(file_path) as file:
-        for line in file:
-            line = line.strip()
-            if not line.startswith('>'):
-                dna += line
-
-    return dna
-
-
 def main(argv):
-    dna   = read_fasta(argv[0])
+    dna   = fasta.read_one(argv[0])
     kmers = [''.join(p) for p in product(*[['A', 'C', 'G', 'T']] * 4)]
 
     A = []

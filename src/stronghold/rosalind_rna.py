@@ -1,21 +1,13 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def dna_to_rna(string):
-    rna_string = []
-
-    for character in string:
-        if character == 'T':
-            rna_string.append('U')
-        else:
-            rna_string.append(character)
-
-    return ''.join(rna_string)
+import genetics
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        print dna_to_rna(file.readline().strip())
+    print genetics.dna_to_rna(files.read_line(argv[0]))
 
 
 if __name__ == "__main__":

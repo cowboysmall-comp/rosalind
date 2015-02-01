@@ -1,37 +1,17 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def codon_table(file_path):
-    table = {}
-
-    with open(file_path) as file:
-        for line in file:
-            items = line.strip().split()
-            for key, value in zip(*[iter(items)] * 2):
-                table[key] = value
-
-    return table
-
-
-def encode_protein(file_path, table):
-    encode = ''
-
-    with open(file_path) as file:
-        line = file.readline().strip()
-        for chunk in [line[i:i + 3] for i in xrange(0, len(line), 3)]:
-            amino = table[chunk]
-            if amino != 'Stop':
-                encode += amino
-            else:
-                break
-
-    return encode
+import tables
+import genetics
+import files
 
 
 def main(argv):
-    table = codon_table(argv[0])
+    table = tables.codon(argv[0])
+    rna   = files.read_line(argv[1])
 
-    print encode_protein(argv[1], table)
+    print genetics.encode_protein(rna, table)
 
 
 if __name__ == "__main__":

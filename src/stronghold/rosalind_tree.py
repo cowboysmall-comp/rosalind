@@ -1,6 +1,8 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from tools import unionfind
+import unionfind
 
 
 def read_graph(file_path):

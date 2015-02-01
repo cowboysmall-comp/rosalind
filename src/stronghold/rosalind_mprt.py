@@ -1,8 +1,10 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
+
+import fasta
 import re
 import urllib2
-
-from collections import defaultdict
 
 
 def read_data(file_path):
@@ -10,23 +12,12 @@ def read_data(file_path):
 
     with open(file_path) as file:
         for line in file:
-            label       = line.strip()
-            remote      = urllib2.urlopen('http://www.uniprot.org/uniprot/%s.fasta' % (label))
-            string      = read_remote(remote)
+            label  = line.strip()
+            remote = urllib2.urlopen('http://www.uniprot.org/uniprot/%s.fasta' % (label))
+            string = fasta.read_one_from(remote)
             data.append((label, string))
 
     return data
-
-
-def read_remote(remote):
-    string = ''
-
-    for line in remote:
-        line = line.strip()
-        if not line.startswith('>'):
-            string += line
-
-    return string
 
 
 def main(argv):

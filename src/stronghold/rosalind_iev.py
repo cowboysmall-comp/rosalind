@@ -1,13 +1,14 @@
+import os
 import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
+
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        numbers = [int(i) for i in file.readline().split()]
+    nums = files.read_line_of_ints(argv[0])
 
-        p = 2 * numbers[0] + 2 * numbers[1] + 2 * numbers[2] + 1.5 * numbers[3] + 1 * numbers[4]
-
-        print '%0.1f' % (p)
+    print '%0.1f' % (2 * nums[0] + 2 * nums[1] + 2 * nums[2] + 1.5 * nums[3] + 1 * nums[4])
 
 
 if __name__ == "__main__":

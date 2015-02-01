@@ -1,46 +1,17 @@
+import os
 import sys
-import math
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from itertools import product
-
-
-def permutations(values):
-    if values:
-        perms = []
-        done  = []
-
-        for value in values:
-
-            if -value not in done:
-                temp = values[:]
-                temp.remove(value)
-
-                for perm in permutations(temp):
-                    perms.append([-value] + perm)
-
-            done.append(-value)
-
-            if value not in done:
-                temp = values[:]
-                temp.remove(value)
-
-                for perm in permutations(temp):
-                    perms.append([value] + perm)
-
-            done.append(value)
-
-        return perms
-    else:
-        return [[]]
+import combs
+import files
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n     = list(xrange(1, int(file.readline().strip()) + 1))
-        perms = permutations(n)
+    n     = files.read_int(argv[0])
+    perms = combs.enumerate_signed_permutations([i for i in xrange(1, n + 1)])
 
-        print len(perms)
-        print '\n'.join(' '.join([str(p) for p in perm]) for perm in perms)
+    print len(perms)
+    print '\n'.join(' '.join([str(p) for p in perm]) for perm in perms)
 
 
 if __name__ == "__main__":

@@ -1,16 +1,15 @@
+import os
 import sys
-import math
+sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-
-def combinations(n, r):
-    return math.factorial(n) / (math.factorial(r) * math.factorial(n - r))
+import files
+import combs
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n, m = [int(i) for i in file.readline().split()]
+    n, m = files.read_line_of_ints(argv[0])
 
-        print sum(combinations(n, i) for i in xrange(m, n + 1)) % 1000000
+    print sum(combs.combinations(n, i) for i in xrange(m, n + 1)) % 1000000
 
 
 if __name__ == "__main__":
