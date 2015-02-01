@@ -1,5 +1,5 @@
-
 from itertools import combinations
+
 
 '''
     this is a version of the below implementation that uses indexes

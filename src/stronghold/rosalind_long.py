@@ -7,7 +7,9 @@ import strings
 
 
 def main(argv):
-    print strings.shortest_superstring(fasta.read(argv[0]).values())
+    dna_strings = fasta.read(argv[0]).values()
+
+    print strings.shortest_superstring(dna_strings)
 
 
 if __name__ == "__main__":

@@ -7,11 +7,11 @@ import fasta
 
 def find_indices(s, t):
     indices = []
-    pos     = 0
+    index   = 0
 
     for c in t:
-        pos = s.find(c, pos) + 1
-        indices.append(pos)
+        index = s.find(c, index) + 1
+        indices.append(index)
 
     return indices
 

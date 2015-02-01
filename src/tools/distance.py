@@ -1,6 +1,6 @@
 
-TRANS = {'A': 'G', 'G': 'A', 'C': 'T', 'T': 'C'}
 
+TRANS = {'A': 'G', 'G': 'A', 'C': 'T', 'T': 'C'}
 
 def hamming(s, t):
     return sum(x != y for x, y in zip(s, t))

@@ -2,14 +2,17 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-import probs
+import trie
 import files
 
 
 def main(argv):
-    k, N  = files.read_line_of_ints(argv[0])
+    tries = trie.Trie()
 
-    print '%0.3f' % probs.mendel2(k, N, 0.25)
+    for line in files.read_lines(argv[0]):
+        tries.insert(line)
+
+    print '\n'.join('%s %s %s' % trie for trie in tries.edges())
 
 
 if __name__ == "__main__":

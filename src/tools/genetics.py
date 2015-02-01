@@ -238,3 +238,19 @@ def count_rnas_from_protein(protein, table):
 
     return total
 
+
+def find_locations_in_protein(protein, motif):
+    return [match.start() + 1 for match in re.compile(motif).finditer(protein)]
+
+
+def find_locations_in_protein_data(data, motif):
+    locations = []
+
+    for protein in data:
+        found = find_locations_in_protein(protein[1], motif)
+        if found:
+            locations.append((protein[0], found))
+
+    return locations
+
+
