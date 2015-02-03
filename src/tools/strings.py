@@ -150,8 +150,7 @@ def longest_common_subsequence(s, t):
             m -= 1
         elif C[m][n] == C[m][n - 1]:
             n -= 1
-
-        if s[m - 1] == t[n - 1]:
+        elif s[m - 1] == t[n - 1]:
             sequence.insert(0, s[m - 1])
             m -= 1
             n -= 1
