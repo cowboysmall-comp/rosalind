@@ -1,0 +1,4 @@
+>Rosalind_43
+GCATGCU
+>Rosalind_97
+GATTACA

@@ -11,7 +11,7 @@ def main(argv):
     table   = tables.mass(argv[0])
     protein = files.read_line(argv[1])
 
-    print '%0.3f' % (genetics.protein_weight(protein, table))
+    print '%0.3f' % genetics.protein_weight(protein, table)
 
 
 if __name__ == "__main__":

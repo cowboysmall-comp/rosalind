@@ -35,6 +35,60 @@ from itertools import combinations
 
 '''
 
+MATCH    = 0
+MISMATCH = 1
+GAP      = 1
+
+
+def alignment_table(s, t):
+    m = len(s)
+    n = len(t)
+
+    T = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        T[i][0] = GAP * i
+
+    for j in xrange(1, n + 1):
+        T[0][j] = GAP * j
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            if s[i - 1] == t[j - 1]:
+                T[i][j] = T[i - 1][j - 1] + MATCH
+            else:
+                T[i][j] = min(T[i - 1][j - 1] + MISMATCH, T[i - 1][j] + GAP, T[i][j - 1] + GAP)
+
+    return T
+
+
+def optimal_alignment(s, t):
+    m   = len(s)
+    n   = len(t)
+
+    T   = alignment_table(s, t)
+    e_d = T[m][n]
+
+    s_a = []
+    t_a = []
+
+    while m != 0 and n != 0:
+        if T[m][n] == T[m - 1][n] + GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif T[m][n] == T[m][n - 1] + GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        elif T[m][n] == T[m - 1][n - 1] + (MATCH if s[m - 1] == t[n - 1] else MISMATCH):
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            m -= 1
+            n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
 
 def failure_array(string):
     N   = len(string)
@@ -65,7 +119,6 @@ def longest_subsequence(seq, increasing = True):
             sub.append(max([sub[j] for j in xrange(i) if sub[j][-1] > seq[i]] or [[]], key = len) + [seq[i]])
 
     return max(sub, key = len)
-
 
 
 def sequence_table(s, t):
@@ -106,7 +159,6 @@ def longest_common_subsequence(s, t):
     return ''.join(sequence)
 
 
-
 def shortest_supersequence(s, t):
     lcs = longest_common_subsequence(s, t)
     scs = ''
@@ -130,7 +182,6 @@ def shortest_supersequence(s, t):
         scs += t
 
     return scs
-
 
 
 def find_overlaps(s, t):

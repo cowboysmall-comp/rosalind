@@ -9,7 +9,7 @@ import probs
 def main(argv):
     k, m, n = files.read_line_of_ints(argv[0])
 
-    print '%0.6f' % (probs.mendel1(k, m, n))
+    print '%0.6f' % probs.mendel1(k, m, n)
 
 
 if __name__ == "__main__":

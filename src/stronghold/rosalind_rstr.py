@@ -11,7 +11,7 @@ def main(argv):
         N, gc = int(items[0]), float(items[1])
         dna   = file.readline().strip()
 
-        print '%0.3f' % ( 1 - ( ( 1 - probs.gc(dna, gc) ) ** N ) )
+        print '%0.3f' % ( 1 - ( ( 1 - probs.gc_probability(dna, gc) ) ** N ) )
 
 
 if __name__ == "__main__":
