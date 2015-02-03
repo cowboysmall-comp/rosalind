@@ -1,5 +1,6 @@
 import os
 import sys
+import math
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import probs
@@ -10,7 +11,7 @@ def main(argv):
         dna = file.readline().strip()
         A   = [float(item) for item in file.readline().split()]
 
-        B   = [probs.gc_probability_cl(dna, a) for a in A]
+        B   = [math.log10(probs.gc(dna, a)) for a in A]
 
         print ' '.join('%0.3f' % b for b in B)
 

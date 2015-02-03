@@ -12,7 +12,7 @@ def main(argv):
         A = [float(item) for item in file.readline().split()]
 
         r = n - len(s) + 1
-        B = [(probs.gc_probability(s, a) * r) for a in A]
+        B = [(probs.gc(s, a) * r) for a in A]
 
         print ' '.join('%0.3f' % b for b in B)
 

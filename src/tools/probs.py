@@ -2,15 +2,11 @@ import math
 import combs
 
 
-def gc_probability(string, gc):
+def gc(string, gc):
     count_gc = string.count('G') + string.count('C')
     count_at = string.count('A') + string.count('T')
 
     return ((gc / 2.0) ** count_gc) * (((1 - gc) / 2.0) ** count_at)
-
-
-def gc_probability_cl(string, gc):
-    return math.log10(gc_probability(string, gc))
 
 
 def binomial(n, k, p):
