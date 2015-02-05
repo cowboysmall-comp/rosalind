@@ -34,6 +34,7 @@ class Node:
 
 
     def add_child(self, node):
+        node.parent = self
         self.children.append(node)
 
 
@@ -65,8 +66,7 @@ def build_suffix_tree(string, edges):
         end          = int(values[3])
         child.data   = string[start:start + end]
 
-        child.parent = parent
         parent.add_child(child)
 
-    return child.get_root()
+    return nodes.values()[0].get_root()
 
