@@ -2,14 +2,14 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-import combs
 import files
+import combinatorics
 
 
 def main(argv):
     n, m = files.read_line_of_ints(argv[0])
 
-    print combs.fibonacci_with_mortality(n, m)
+    print combinatorics.fibonacci_with_mortality(n, m)
 
 
 if __name__ == "__main__":

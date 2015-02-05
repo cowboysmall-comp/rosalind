@@ -10,7 +10,9 @@ def read_lines(file_path):
 
     with open(file_path) as file:
         for line in file:
-            lines.append(line.strip())
+            line = line.strip()
+            if line:
+                lines.append(line)
 
     return lines
 
@@ -25,7 +27,9 @@ def read_floats(file_path):
 
     with open(file_path) as file:
         for line in file:
-            floats.append(float(line.strip()))
+            line = line.strip()
+            if line:
+                floats.append(float(line))
 
     return floats
 
@@ -40,7 +44,9 @@ def read_ints(file_path):
 
     with open(file_path) as file:
         for line in file:
-            ints.append(int(line.strip()))
+            line = line.strip()
+            if line:
+                ints.append(int(line))
 
     return ints
 
@@ -55,7 +61,9 @@ def read_lines_of_floats(file_path):
 
     with open(file_path) as file:
         for line in file:
-            lines.append([float(i) for i in line.split()])
+            line = line.strip()
+            if line:
+                lines.append([float(i) for i in line.split()])
 
     return lines
 
@@ -70,7 +78,9 @@ def read_lines_of_ints(file_path):
 
     with open(file_path) as file:
         for line in file:
-            lines.append([int(i) for i in line.split()])
+            line = line.strip()
+            if line:
+                lines.append([int(i) for i in line.split()])
 
     return lines
 

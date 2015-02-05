@@ -1,40 +1,6 @@
 from itertools import combinations
 
 
-'''
-    this is a version of the below implementation that uses indexes
-    rather than string slicing. Also, I'm going to have to start 
-    refactoring code into tools.
-
-    def shortest_supersequence(s, t, lcs):
-        scs  = ''
-
-        idxs = 0
-        idxt = 0
-
-        for char in lcs:
-            while idxs < len(s) and s[idxs] != char:
-                scs  += s[idxs]
-                idxs += 1
-
-            while idxt < len(t) and t[idxt] != char:
-                scs  += t[idxt]
-                idxt += 1
-
-            scs  += char
-            idxs += 1
-            idxt += 1
-
-        if idxs < len(s):
-            scs += s[idxs:]
-
-        if idxt < len(t):
-            scs += t[idxt:]
-
-        return scs
-
-'''
-
 MATCH    = 0
 MISMATCH = 1
 GAP      = 1
@@ -158,6 +124,40 @@ def longest_common_subsequence(s, t):
     return ''.join(sequence)
 
 
+'''
+    this is a version of the below implementation that uses indexes
+    rather than string slicing. Also, I'm going to have to start 
+    refactoring code into tools.
+
+    def shortest_supersequence(s, t, lcs):
+        scs  = ''
+
+        idxs = 0
+        idxt = 0
+
+        for char in lcs:
+            while idxs < len(s) and s[idxs] != char:
+                scs  += s[idxs]
+                idxs += 1
+
+            while idxt < len(t) and t[idxt] != char:
+                scs  += t[idxt]
+                idxt += 1
+
+            scs  += char
+            idxs += 1
+            idxt += 1
+
+        if idxs < len(s):
+            scs += s[idxs:]
+
+        if idxt < len(t):
+            scs += t[idxt:]
+
+        return scs
+
+'''
+
 def shortest_supersequence(s, t):
     lcs = longest_common_subsequence(s, t)
     scs = ''
@@ -225,4 +225,56 @@ def longest_common_substring(strings):
                 longest = current
 
     return longest
+
+
+def interwoven_sequences(S1, S2):
+    l1 = len(S1)
+    l2 = len(S2)
+
+    if l1 + l2 == 1:
+        return S1 if l2 == 0 else S2
+
+    sequences = set()
+
+    if S1:
+        for sequence in interwoven_sequences(S1[1:], S2):
+                sequences.add(S1[0] + sequence)
+
+    if S2:
+        for sequence in interwoven_sequences(S1, S2[1:]):
+                sequences.add(S2[0] + sequence)
+
+    return sequences
+
+
+def interwoven_matrix(string, strings):
+    l = len(strings)
+    M = [[0 for i in xrange(l)] for _ in xrange(l)]
+
+    for i in xrange(l):
+        for j in xrange(i, l):
+            for sequence in interwoven_sequences(strings[i], strings[j]):
+                if sequence in string:
+                    M[i][j] = 1
+                    M[j][i] = 1
+                    break
+
+    return M
+
+
+def longest_substring(node, k):
+    strings = []
+
+    for child in node.children:
+        string = child.data
+        if child.descendent_count() >= k:
+            substrings = longest_substring(child, k)
+            if substrings:
+                for substring in substrings:
+                    strings.append(string + substring)
+            else:
+                strings.append(string)
+
+    return sorted(strings)
+
 

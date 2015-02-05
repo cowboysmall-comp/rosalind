@@ -7,9 +7,10 @@ import strings
 
 
 def main(argv):
-    s, t = files.read_lines(argv[0])
+    dna_strings = files.read_lines(argv[0])
+    matrix      = strings.interwoven_matrix(dna_strings[0], dna_strings[1:])
 
-    print strings.shortest_supersequence(s, t)
+    print '\n'.join(' '.join(str(z) for z in y) for y in matrix)
 
 
 if __name__ == "__main__":

@@ -38,5 +38,6 @@ class Trie:
             return current_label
 
         edges_traversal(self._root[''], 1)
+
         return labeled
 

@@ -2,8 +2,8 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-import distance
 import files
+import distance
 
 
 def main(argv):

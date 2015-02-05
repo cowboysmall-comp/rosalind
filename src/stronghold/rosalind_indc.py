@@ -1,10 +1,10 @@
 import os
 import sys
-import math
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import probs
+import math
 
 
 def main(argv):

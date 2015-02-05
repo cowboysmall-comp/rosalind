@@ -4,6 +4,68 @@ from collections import defaultdict
 from itertools   import product
 
 
+DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+
+RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
+
+
+def dna_count(string):
+    symbols = defaultdict(int)
+
+    for character in string:
+        symbols[character] += 1    
+
+    return symbols
+
+
+def dna_complement(string):
+    dna = []
+
+    for character in string:
+        dna.append(DNA_COMPLEMENT[character])
+
+    return ''.join(dna[::-1])
+
+
+def dna_to_rna(string):
+    rna_string = []
+
+    for character in string:
+        if character == 'T':
+            rna_string.append('U')
+        else:
+            rna_string.append(character)
+
+    return ''.join(rna_string)
+
+
+def gc_content(string):
+    return 100 * float(string.count('G') + string.count('C')) / len(string)
+
+
+def gc_contents(strings):
+    contents = []
+
+    for label, string in strings.iteritems():
+        contents.append((label, gc_content(string)))
+
+    return contents
+
+
+def kmer_composition(string, alpha, k):
+    kmers = [''.join(p) for p in product(*[alpha] * k)]
+
+    A = []
+    for kmer in kmers:
+        A.append(len(re.findall(r'(?=(%s))' % kmer, string)))
+
+    return A
+
+
+def check_occurences(rna):
+    return rna.count('A') == rna.count('U') and rna.count('C') == rna.count('G')
+
+
 """
     Here are some earlier (and alternative) versions of the perfect 
     matcher:
@@ -105,69 +167,6 @@ from itertools   import product
     I have no idea what's going on here :-)
 
 """
-
-
-DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
-
-RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
-
-
-def dna_count(string):
-    symbols = defaultdict(int)
-
-    for character in string:
-        symbols[character] += 1    
-
-    return symbols
-
-
-def dna_complement(string):
-    dna = []
-
-    for character in string:
-        dna.append(DNA_COMPLEMENT[character])
-
-    return ''.join(dna[::-1])
-
-
-def dna_to_rna(string):
-    rna_string = []
-
-    for character in string:
-        if character == 'T':
-            rna_string.append('U')
-        else:
-            rna_string.append(character)
-
-    return ''.join(rna_string)
-
-
-def gc_contents(strings):
-    contents = []
-
-    for label, string in strings.iteritems():
-        contents.append((label, gc_content(string)))
-
-    return contents
-
-
-def gc_content(string):
-    return 100 * float(string.count('G') + string.count('C')) / len(string)
-
-
-def kmer_composition(string, alpha, k):
-    kmers = [''.join(p) for p in product(*[alpha] * k)]
-
-    A = []
-    for kmer in kmers:
-        A.append(len(re.findall(r'(?=(%s))' % kmer, string)))
-
-    return A
-
-
-def check_occurences(rna):
-    return rna.count('A') == rna.count('U') and rna.count('C') == rna.count('G')
-
 
 def perfect_matchings(rna):
     A = {}

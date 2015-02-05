@@ -2,13 +2,13 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-import unionfind
 import files
+import unionfind
 
 
 def main(argv):
     n, edges = files.read_graph(argv[0])
-    uf       = unionfind.UnionFind(n)
+    uf       = unionfind.QuickFind(n)
 
     for edge in edges:
         uf.union(edge[0], edge[1])

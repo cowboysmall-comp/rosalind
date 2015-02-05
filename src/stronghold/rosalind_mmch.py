@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import fasta
-import combs
+import combinatorics
 
 
 def main(argv):
@@ -15,7 +15,7 @@ def main(argv):
     cg_max = max(rna.count('C'), rna.count('G'))
     cg_min = min(rna.count('C'), rna.count('G'))
 
-    print combs.permutations(au_max, au_min) * combs.permutations(cg_max, cg_min)
+    print combinatorics.permutations(au_max, au_min) * combinatorics.permutations(cg_max, cg_min)
 
 
 if __name__ == "__main__":
