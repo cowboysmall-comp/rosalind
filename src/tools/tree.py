@@ -66,7 +66,7 @@ def build_suffix_tree(string, edges):
         child.data   = string[start:start + end]
 
         child.parent = parent
-        parent.children.append(child)
+        parent.add_child(child)
 
     return child.get_root()
 
