@@ -247,15 +247,15 @@ def interwoven_sequences(string1, string2):
     return sequences
 
 
-def are_interwoven(string, string1, string2):
+def sequences_interweave(string, string1, string2):
     if len(string1) == 0:
         return string.startswith(string2)
 
     if len(string2) == 0:
         return string.startswith(string1)
 
-    case1 = string1[0] == string[0] and are_interwoven(string[1:], string1[1:], string2)
-    case2 = string2[0] == string[0] and are_interwoven(string[1:], string1, string2[1:])
+    case1 = string1[0] == string[0] and sequences_interweave(string[1:], string1[1:], string2)
+    case2 = string2[0] == string[0] and sequences_interweave(string[1:], string1, string2[1:])
 
     return case1 or case2
 
@@ -269,7 +269,7 @@ def interwoven_matrix(string, strings):
     for i in xrange(lstrings):
         for j in xrange(i, lstrings):
             for k in xrange(lstring - lall[i] - lall[j] + 1):
-                if are_interwoven(string[k:], strings[i], strings[j]):
+                if sequences_interweave(string[k:], strings[i], strings[j]):
                     M[i][j] = 1
                     M[j][i] = 1
 
