@@ -1,5 +1,11 @@
 
 
+def write_lines(file_path, lines):
+    with open(file_path, 'w') as file:
+        for line in lines:
+            file.write(line + '\n')
+
+
 def read_line(file_path):
     with open(file_path) as file:
         return file.readline().strip()
@@ -49,6 +55,23 @@ def read_ints(file_path):
                 ints.append(int(line))
 
     return ints
+
+
+def read_line_of_words(file_path):
+    with open(file_path) as file:
+        return [word for word in file.readline().split()]
+
+
+def read_lines_of_words(file_path):
+    lines = []
+
+    with open(file_path) as file:
+        for line in file:
+            line = line.strip()
+            if line:
+                lines.append([word for word in line.split()])
+
+    return lines
 
 
 def read_line_of_floats(file_path):

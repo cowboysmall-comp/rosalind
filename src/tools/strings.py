@@ -227,37 +227,49 @@ def longest_common_substring(strings):
     return longest
 
 
-def interwoven_sequences(S1, S2):
-    l1 = len(S1)
-    l2 = len(S2)
+def interwoven_sequences(string1, string2):
+    length1 = len(string1)
+    length2 = len(string2)
 
-    if l1 + l2 == 1:
-        return S1 if l2 == 0 else S2
+    if length1 + length2 == 1:
+        return string1 if length2 == 0 else string2
 
     sequences = set()
 
-    if S1:
-        for sequence in interwoven_sequences(S1[1:], S2):
-                sequences.add(S1[0] + sequence)
+    if string1:
+        for sequence in interwoven_sequences(string1[1:], string2):
+                sequences.add(string1[0] + sequence)
 
-    if S2:
-        for sequence in interwoven_sequences(S1, S2[1:]):
-                sequences.add(S2[0] + sequence)
+    if string2:
+        for sequence in interwoven_sequences(string1, string2[1:]):
+                sequences.add(string2[0] + sequence)
 
     return sequences
 
 
-def interwoven_matrix(string, strings):
-    l = len(strings)
-    M = [[0 for i in xrange(l)] for _ in xrange(l)]
+def are_interwoven(string, string1, string2):
+    if len(string1) == 0:
+        return string.startswith(string2)
 
-    for i in xrange(l):
-        for j in xrange(i, l):
-            for sequence in interwoven_sequences(strings[i], strings[j]):
-                if sequence in string:
+    if len(string2) == 0:
+        return string.startswith(string1)
+
+    return (string1[0] == string[0] and are_interwoven(string[1:], string1[1:], string2) or 
+            string2[0] == string[0] and are_interwoven(string[1:], string1, string2[1:]))
+
+
+def interwoven_matrix(string, strings):
+    lstring  = len(string)
+    lstrings = len(strings)
+    lall     = [len(s) for s in strings]
+    M        = [[0 for i in xrange(lsts)] for _ in xrange(lsts)]
+
+    for i in xrange(lstrings):
+        for j in xrange(i, lstrings):
+            for k in xrange(lstring - lall[i] - lall[j] + 1):
+                if are_interwoven(string[k:], strings[i], strings[j]):
                     M[i][j] = 1
                     M[j][i] = 1
-                    break
 
     return M
 
