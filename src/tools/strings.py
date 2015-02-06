@@ -254,15 +254,17 @@ def are_interwoven(string, string1, string2):
     if len(string2) == 0:
         return string.startswith(string1)
 
-    return (string1[0] == string[0] and are_interwoven(string[1:], string1[1:], string2) or 
-            string2[0] == string[0] and are_interwoven(string[1:], string1, string2[1:]))
+    case1 = string1[0] == string[0] and are_interwoven(string[1:], string1[1:], string2)
+    case2 = string2[0] == string[0] and are_interwoven(string[1:], string1, string2[1:])
+
+    return case1 or case2
 
 
 def interwoven_matrix(string, strings):
     lstring  = len(string)
     lstrings = len(strings)
     lall     = [len(s) for s in strings]
-    M        = [[0 for i in xrange(lsts)] for _ in xrange(lsts)]
+    M        = [[0 for i in xrange(lstrings)] for _ in xrange(lstrings)]
 
     for i in xrange(lstrings):
         for j in xrange(i, lstrings):
