@@ -7,6 +7,7 @@ import files
 
 def main(argv):
     p, q = files.read_line_of_ints(argv[0])
+
     print p ** 2 + q ** 2
 
 

@@ -14,8 +14,6 @@ def main(argv):
     for word in words:
         freq[word] += 1
 
-
-
     print '\n'.join('%s %s' % (key, value) for key, value in freq.items())
 
 
