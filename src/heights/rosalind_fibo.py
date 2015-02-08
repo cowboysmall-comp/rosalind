@@ -3,14 +3,11 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import arrays
+import combinatorics
 
 
 def main(argv):
-    words = files.read_line_of_words(argv[0])
-    freq  = arrays.frequency_table(words)
-
-    print '\n'.join('%s %s' % (w, f) for w, f in freq.iteritems())
+    print combinatorics.fibonacci(files.read_int(argv[0]))
 
 
 if __name__ == "__main__":

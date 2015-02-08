@@ -9,6 +9,14 @@ def permutations(n, r):
     return math.factorial(n) / math.factorial(n - r)
 
 
+def fibonacci(n):
+    fib = [0, 1]
+    for _ in xrange(2, n + 1):
+        fib.append(fib[-1] + fib[-2])
+
+    return fib[n]
+
+
 def fibonacci_with_reproduction(n, k):
     fib = [1, 1]
 

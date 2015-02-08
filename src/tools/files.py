@@ -110,12 +110,51 @@ def read_lines_of_ints(file_path):
 
 def read_graph(file_path):
     with open(file_path) as file:
-        n     = int(file.readline().strip())
+        graph = [int(i) for i in file.readline().split()]
         edges = []
 
         for line in file:
             tail, head = line.strip().split()
             edges.append((int(tail), int(head)))
 
-    return n, edges
+        graph.append(edges)
 
+    return graph
+
+
+def read_weighted_graph(file_path):
+    with open(file_path) as file:
+        graph = [int(i) for i in file.readline().split()]
+        edges = []
+
+        for line in file:
+            tail, head, weight = line.strip().split()
+            edges.append((int(tail), int(head), int(weight)))
+
+        graph.append(edges)
+
+    return graph
+
+
+def read_graphs(file_path):
+    with open(file_path) as file:
+        k = int(file.readline().strip())
+
+        graph_count = 0
+        graphs      = []
+        while graph_count < k:
+            file.readline()
+            graph = [int(i) for i in file.readline().split()]
+
+            edge_count = 0
+            edges      = []
+            while edge_count < graph[1]:
+                tail, head = file.readline().strip().split()
+                edges.append((int(tail), int(head)))
+                edge_count += 1
+
+            graph.append(edges)
+            graphs.append(graph)
+            graph_count += 1
+
+    return k, graphs

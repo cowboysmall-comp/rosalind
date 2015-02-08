@@ -7,10 +7,9 @@ import arrays
 
 
 def main(argv):
-    words = files.read_line_of_words(argv[0])
-    freq  = arrays.frequency_table(words)
+    n, A = files.read_lines_of_ints(argv[0])
 
-    print '\n'.join('%s %s' % (w, f) for w, f in freq.iteritems())
+    print ' '.join(str(a) for a in arrays.max_heap(A))
 
 
 if __name__ == "__main__":

@@ -9,15 +9,6 @@ DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
 
 
-def dna_count(string):
-    symbols = defaultdict(int)
-
-    for character in string:
-        symbols[character] += 1    
-
-    return symbols
-
-
 def dna_complement(string):
     dna = []
 

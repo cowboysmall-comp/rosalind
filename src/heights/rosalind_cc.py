@@ -3,14 +3,14 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import arrays
+import graphs
 
 
 def main(argv):
-    words = files.read_line_of_words(argv[0])
-    freq  = arrays.frequency_table(words)
+    n, m, edges = files.read_graph(argv[0])
+    nodes       = [n for n in xrange(1, n + 1)]
 
-    print '\n'.join('%s %s' % (w, f) for w, f in freq.iteritems())
+    print graphs.depth_first_search(nodes, edges)
 
 
 if __name__ == "__main__":

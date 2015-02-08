@@ -3,13 +3,13 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import genetics
+import arrays
 
 
 def main(argv):
-    symbols = genetics.dna_count(files.read_line(argv[0]))
+    freq = arrays.frequency_table(files.read_line(argv[0]))
 
-    print '%s %s %s %s' % (symbols['A'], symbols['C'], symbols['G'], symbols['T'])
+    print '%s %s %s %s' % (freq['A'], freq['C'], freq['G'], freq['T'])
 
 
 if __name__ == "__main__":
