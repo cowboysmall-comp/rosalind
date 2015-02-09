@@ -143,14 +143,44 @@ def read_graphs(file_path):
         graph_count = 0
         graphs      = []
         while graph_count < k:
-            file.readline()
-            graph = [int(i) for i in file.readline().split()]
+            line = file.readline().strip()
+            while not line:
+                line = file.readline().strip()
+
+            graph = [int(i) for i in line.split()]
 
             edge_count = 0
             edges      = []
             while edge_count < graph[1]:
                 tail, head = file.readline().strip().split()
                 edges.append((int(tail), int(head)))
+                edge_count += 1
+
+            graph.append(edges)
+            graphs.append(graph)
+            graph_count += 1
+
+    return k, graphs
+
+
+def read_weighted_graphs(file_path):
+    with open(file_path) as file:
+        k = int(file.readline().strip())
+
+        graph_count = 0
+        graphs      = []
+        while graph_count < k:
+            line = file.readline().strip()
+            while not line:
+                line = file.readline().strip()
+
+            graph = [int(i) for i in line.split()]
+
+            edge_count = 0
+            edges      = []
+            while edge_count < graph[1]:
+                tail, head, weight = file.readline().strip().split()
+                edges.append((int(tail), int(head), int(weight)))
                 edge_count += 1
 
             graph.append(edges)

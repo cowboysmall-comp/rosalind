@@ -35,12 +35,24 @@ def degree_table(edges):
     return degree
 
 
-def adjacency_table(edges):
+def adjacency_table(edges, directed = True):
     adjacency = defaultdict(list)
 
     for edge in edges:
         adjacency[edge[0]].append(edge[1])
-        adjacency[edge[1]].append(edge[0])
+        if not directed:
+            adjacency[edge[1]].append(edge[0])
+
+    return adjacency
+
+
+def weighted_adjacency_table(edges, directed = True):
+    adjacency = defaultdict(dict)
+
+    for edge in edges:
+        adjacency[edge[0]][edge[1]] = edge[2]
+        if not directed:
+            adjacency[edge[1]][edge[0]] = edge[2]
 
     return adjacency
 
@@ -194,21 +206,21 @@ def bipartite(s, nodes, edges, directed = True):
 
 def cyclic(nodes, edges):
     explored  = defaultdict(int)
-    cycles    = defaultdict(int)
+    colour    = defaultdict(int)
 
     def detect_cycles(node):
         if explored[node] == 0:
             explored[node] += 1
-            cycles[node]   += 1
+            colour[node]   += 1
 
             for edge in edges:
                 if node == edge[0]:
                     if explored[edge[1]] == 0 and detect_cycles(edge[1]):
                         return True
-                    elif cycles[edge[1]] == 1:
+                    elif colour[edge[1]] == 1:
                         return True
 
-        cycles[node] -= 1
+        colour[node] -= 1
         return False
 
     for node in nodes:
@@ -223,7 +235,7 @@ def dijkstra(s, nodes, edges):
     heap     = []
 
     for node in nodes:
-        distance[node] = sys.maxint
+        distance[node] = float('inf')
 
     distance[s] = 0
     heapq.heappush(heap, (0, s))
@@ -240,3 +252,46 @@ def dijkstra(s, nodes, edges):
                     heapq.heappush(heap, (distance[edge[1]], edge[1]))
 
     return distance
+
+
+def bellman_ford(s, nodes, edges):
+    distances = {}
+    updated   = False
+
+    for node in nodes:
+        distances[node] = float('inf')
+
+    distances[s] = 0
+
+    for _ in xrange(len(nodes) - 1):
+        for u, v, w in edges:
+            if distances[v] > distances[u] + w:
+                distances[v] = distances[u] + w
+                updated      = True
+
+        if not updated:
+            break
+
+    return distances
+
+
+def floyd_warshall(nodes, edges):
+    n = len(nodes)
+
+    D = [[float('inf') for _ in xrange(n)] for _ in xrange(n)]
+
+    for node in nodes:
+        D[node - 1][node - 1] = float('inf')
+
+    for edge in edges:
+        D[edge[0] - 1][edge[1] - 1] = edge[2]
+
+    for k in xrange(n):
+        for i in xrange(n):
+            for j in xrange(n):
+                if D[i][j] > D[i][k] + D[k][j]:
+                    D[i][j] = D[i][k] + D[k][j]
+
+    return D
+
+

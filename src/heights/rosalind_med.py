@@ -3,14 +3,16 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import sorts
+import selects
 
 
 def main(argv):
-    n, A = files.read_lines_of_ints(argv[0])
-    sorts.partition3(A, 0, n[0] - 1)
+    data = files.read_lines_of_ints(argv[0])
+    n    = data[0][0]
+    A    = data[1]
+    k    = data[2][0]
 
-    print ' '.join(str(item) for item in A)
+    print selects.quick_select(A, k - 1)
 
 
 if __name__ == "__main__":

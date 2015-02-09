@@ -7,10 +7,12 @@ import sorts
 
 
 def main(argv):
-    n, A = files.read_lines_of_ints(argv[0])
-    sorts.partition3(A, 0, n[0] - 1)
+    data = files.read_lines_of_ints(argv[0])
+    n    = data[0][0]
+    A    = data[1]
+    k    = data[2][0]
 
-    print ' '.join(str(item) for item in A)
+    print ' '.join(str(item) for item in sorts.partial_sort(A, k))
 
 
 if __name__ == "__main__":

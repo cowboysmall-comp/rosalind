@@ -35,6 +35,31 @@ def max_heap(A):
     return A
 
 
+def min_heapify(A, i, l):
+    left     = 2 * i + 1
+    right    = 2 * i + 2
+    smallest = i
+
+    if left < l and A[smallest] > A[left]:
+        smallest = left
+
+    if right < l and A[smallest] > A[right]:
+        smallest = right
+
+    if smallest != i:
+        A[i], A[smallest] = A[smallest], A[i]
+        min_heapify(A, smallest, l)
+
+
+def min_heap(A):
+    l = len(A)
+
+    for i in xrange(l // 2, -1, -1):
+        min_heapify(A, i, l)
+
+    return A
+
+
 def count_inversions(A):
     l = len(A)
     c = 0

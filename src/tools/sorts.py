@@ -95,7 +95,7 @@ def heap_sort(A):
     return heapified
 
 
-def three_way_partition(A, lower, upper):
+def partition3(A, lower, upper):
     gt = upper
     lt = lower
     i  = lower + 1
@@ -112,7 +112,8 @@ def three_way_partition(A, lower, upper):
         else:
             i  += 1
 
-    return A
+    return lt, gt
+
 
 '''
     not sure which version I prefer - Sedgewick or the modified 
@@ -122,37 +123,51 @@ def three_way_partition(A, lower, upper):
 
     def partition(A, lower, upper):
         i = lower + 1
+        j = upper
 
-        for j in xrange(lower + 1, upper + 1):
-            if A[j] < A[lower]:
-                A[j], A[i] = A[i], A[j]
+        p = A[lower]
+
+        while True:
+            while A[i] < p and i < upper:
                 i += 1
 
-        A[lower], A[i - 1] = A[i - 1], A[lower]
+            while p < A[j] and lower < j:
+                j -= 1
 
-        return i
+            if j <= i:
+                break
+
+            A[i], A[j] = A[j], A[i]
+
+        A[lower], A[j] = A[j], A[lower]
+        return j
 
 '''
 
 def partition(A, lower, upper):
     i = lower + 1
-    j = upper
 
-    p = A[lower]
-    while True:
-        while A[i] < p and i < upper:
+    for j in xrange(lower + 1, upper + 1):
+        if A[j] < A[lower]:
+            A[j], A[i] = A[i], A[j]
             i += 1
 
-        while p < A[j] and lower < j:
-            j -= 1
+    A[lower], A[i - 1] = A[i - 1], A[lower]
 
-        if j <= i:
-            break
+    return i
 
-        A[i], A[j] = A[j], A[i]
 
-    A[lower], A[j] = A[j], A[lower]
-    return j
+def partial_sort(A, k):
+    length    = len(A)
+    heapified = arrays.min_heap(A)
+
+    for i in xrange(length - 1, length - k - 1, -1):
+        heapified[i], heapified[0] = heapified[0], heapified[i]
+        length -= 1
+        arrays.min_heapify(heapified, 0, length)
+
+    return heapified[-k:][::-1]
+
 
 
 def insertion_sort(A):

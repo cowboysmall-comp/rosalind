@@ -8,7 +8,7 @@ import graphs
 
 def main(argv):
     n, m, edges = files.read_graph(argv[0])
-    adjacency   = graphs.adjacency_table(edges)
+    adjacency   = graphs.adjacency_table(edges, directed = False)
     D           = []
 
     for i in xrange(1, n + 1):

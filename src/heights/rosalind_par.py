@@ -8,7 +8,7 @@ import sorts
 
 def main(argv):
     n, A = files.read_lines_of_ints(argv[0])
-    A    = sorts.partition(A, 0, n[0] - 1)
+    sorts.partition(A, 0, n[0] - 1)
 
     print ' '.join(str(item) for item in A)
 
