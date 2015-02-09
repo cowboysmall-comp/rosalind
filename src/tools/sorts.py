@@ -169,7 +169,6 @@ def partial_sort(A, k):
     return heapified[-k:][::-1]
 
 
-
 def insertion_sort(A):
     swaps = 0
 
