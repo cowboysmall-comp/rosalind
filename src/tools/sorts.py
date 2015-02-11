@@ -154,7 +154,16 @@ def partition(A, lower, upper):
 
     A[lower], A[i - 1] = A[i - 1], A[lower]
 
-    return i
+    return i - 1
+
+
+def quick_sort(A, lower, higher):
+    if lower < higher:
+        p = partition(A, lower, higher)
+        quick_sort(A, lower, p - 1)
+        quick_sort(A, p + 1, higher)
+
+    return A
 
 
 def partial_sort(A, k):

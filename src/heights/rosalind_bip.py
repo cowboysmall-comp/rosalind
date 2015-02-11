@@ -16,7 +16,7 @@ def main(argv):
         nodes = [n for n in xrange(1, n + 1)]
         C.append(graphs.bipartite(1, nodes, edges, directed = False))
 
-    print ' '.join(str(C[n]) for n in xrange(k))
+    print ' '.join('1' if C[n] else '-1' for n in xrange(k))
 
 
 if __name__ == "__main__":

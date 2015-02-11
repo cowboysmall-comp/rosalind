@@ -33,7 +33,7 @@ def main(argv):
 
     results = [two_sum(A) for A in As]
 
-    print '\n'.join('-1' if len(result) == 0 else '%s %s' % (result[0], result[1]) for result in results)
+    print '\n'.join('%s %s' % (result[0], result[1]) if result else '-1' for result in results)
 
 
 if __name__ == "__main__":

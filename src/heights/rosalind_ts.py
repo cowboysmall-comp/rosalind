@@ -9,9 +9,9 @@ import graphs
 def main(argv):
     n, m, edges = files.read_graph(argv[0])
     nodes       = [n for n in xrange(1, n + 1)]
-    degree      = graphs.degree_table(edges, directed = False)
+    topological = graphs.topological_sort(nodes, edges)
 
-    print ' '.join(str(degree[node]) for node in nodes)
+    print ' '.join(str(node) for node in topological)
 
 
 if __name__ == "__main__":

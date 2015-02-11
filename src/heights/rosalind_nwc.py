@@ -15,9 +15,9 @@ def main(argv):
         edges   = G[2]
         nodes   = [n for n in xrange(1, n + 1)]
         t, h, w = edges[0]
-        D.append(graphs.dijkstra(h, nodes, edges)[t] + w)
+        D.append(graphs.negative_weight_cycle(nodes, edges))
 
-    print ' '.join(str(d) if d != float('inf') else '-1' for d in D)
+    print ' '.join('1' if d else '-1' for d in D)
 
 
 

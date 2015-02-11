@@ -16,15 +16,19 @@ def create_row(node, names):
     return split
 
 
-def main(argv):
-    tree  = Tree(files.read_line(argv[0]), format = 1)
+def create_table(tree):
     names = sorted(tree.get_leaf_names())
-
     table = []
 
     for node in tree.get_descendants():
         if not node.is_leaf():
             table.append(create_row(node, names))
+
+    return table
+
+
+def main(argv):
+    table = create_table(Tree(files.read_line(argv[0]), format = 1))
 
     print '\n'.join(''.join(str(r) for r in row) for row in table)
 

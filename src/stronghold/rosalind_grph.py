@@ -8,8 +8,8 @@ import graphs
 
 def main(argv):
     strings = fasta.read(argv[0])
-    nodes   = graphs.create_nodes(strings)
-    edges   = graphs.create_edges(nodes)
+    nodes   = graphs.create_overlap_nodes(strings, 3)
+    edges   = graphs.create_overlap_edges(nodes)
 
     print '\n'.join(['%s %s' % (edge) for edge in edges])
 

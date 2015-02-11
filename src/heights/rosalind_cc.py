@@ -10,7 +10,7 @@ def main(argv):
     n, m, edges = files.read_graph(argv[0])
     nodes       = [n for n in xrange(1, n + 1)]
 
-    print graphs.depth_first_search(nodes, edges)
+    print len(graphs.connected_components(nodes, edges, directed = False))
 
 
 if __name__ == "__main__":

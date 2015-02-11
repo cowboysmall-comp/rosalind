@@ -7,11 +7,11 @@ import graphs
 
 
 def main(argv):
-    n, m, edges = files.read_graph(argv[0])
+    n, m, edges = files.read_weighted_graph(argv[0])
     nodes       = [n for n in xrange(1, n + 1)]
-    degree      = graphs.degree_table(edges, directed = False)
+    D           = graphs.shortest_path(1, nodes, edges)
 
-    print ' '.join(str(degree[node]) for node in nodes)
+    print ' '.join(str(D[node]) if D[node] != float('inf') else 'x' for node in nodes)
 
 
 if __name__ == "__main__":

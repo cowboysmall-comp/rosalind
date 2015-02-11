@@ -3,17 +3,15 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import arrays
+import sorts
 
 
 def main(argv):
     data = files.read_lines_of_ints(argv[0])
-    k    = data[0][0]
-    n    = data[0][1]
-    As   = data[1:]
-    M    = [arrays.majority_element(A) for A in As]
+    n    = data[0][0]
+    A    = data[1]
 
-    print ' '.join(str(M[i]) for i in xrange(k))
+    print ' '.join(str(item) for item in sorts.quick_sort(A, 0, n - 1))
 
 
 if __name__ == "__main__":

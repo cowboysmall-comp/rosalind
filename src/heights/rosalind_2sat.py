@@ -7,17 +7,18 @@ import graphs
 
 
 def main(argv):
-    k, Gs = files.read_graphs(argv[0])
-    C     = []
+    k, Gs       = files.read_graphs(argv[0])
+    assignments = []
 
     for G in Gs:
         n, m  = G[:2]
         edges = G[2]
         nodes = [n for n in xrange(1, n + 1)]
-        C.append(graphs.cyclic(nodes, edges))
+        assignments.append(graphs.two_satisfiable(nodes, edges))
 
-    print ' '.join('1' if C[n] else '-1' for n in xrange(k))
+    print '\n'.join('1 %s' % ' '.join(str(a) for a in assignment) if assignment else '0' for assignment in assignments)
 
 
 if __name__ == "__main__":
+    sys.setrecursionlimit(1048576)
     main(sys.argv[1:])

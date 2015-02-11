@@ -163,7 +163,7 @@ def perfect_matchings(rna):
     A = {}
 
     def match(rna):
-        if len(rna) == 0:
+        if len(rna) < 2:
             return 1
         elif rna not in A:
             A[rna] = 0
@@ -182,7 +182,7 @@ def matchings(rna):
     A = {}
 
     def match(rna):
-        if len(rna) == 0 or len(rna) == 1:
+        if len(rna) < 2:
             return 1
         elif rna not in A:
             A[rna]  = match(rna[1:])
@@ -191,6 +191,27 @@ def matchings(rna):
                 if rna[0] == RNA_COMPLEMENT[rna[i]]:
                     A[rna] += match(rna[1:i]) * match(rna[i + 1:])
                     A[rna] %= 1000000
+
+        return A[rna]
+
+    return match(rna)
+
+
+def check_wobble(rna1, rna2):
+    return (rna1 == 'U' and rna2 == 'G') or (rna1 == 'G' and rna2 == 'U')
+
+
+def wobble_matchings(rna):
+    A = {}
+
+    def match(rna):
+        if len(rna) < 4:
+            return 1
+        elif rna not in A:
+            A[rna]  = match(rna[1:])
+            for i in xrange(4, len(rna)):
+                if rna[0] == RNA_COMPLEMENT[rna[i]] or check_wobble(rna[0], rna[i]):
+                    A[rna] += match(rna[1:i]) * match(rna[i + 1:])
 
         return A[rna]
 

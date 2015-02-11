@@ -10,6 +10,17 @@ def frequency_table(A):
     return freq
 
 
+def reverse_frequency_table(A):
+    return [(value, key) for key, value in frequency_table(A).iteritems()]
+
+
+def majority_element(A):
+    l        = len(A)
+    elements = filter(lambda x: x[0] > l / 2, reverse_frequency_table(A))
+
+    return max(elements)[1] if elements else -1
+
+
 def max_heapify(A, i, l):
     left    = 2 * i + 1
     right   = 2 * i + 2

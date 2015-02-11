@@ -8,16 +8,17 @@ import graphs
 
 def main(argv):
     k, Gs = files.read_graphs(argv[0])
-    C     = []
+    sc    = []
 
     for G in Gs:
         n, m  = G[:2]
         edges = G[2]
         nodes = [n for n in xrange(1, n + 1)]
-        C.append(graphs.cyclic(nodes, edges))
+        sc.append(graphs.semi_connected(nodes, edges))
 
-    print ' '.join('1' if C[n] else '-1' for n in xrange(k))
+    print ' '.join('1' if s else '-1' for s in sc)
 
 
 if __name__ == "__main__":
+    sys.setrecursionlimit(1048576)
     main(sys.argv[1:])

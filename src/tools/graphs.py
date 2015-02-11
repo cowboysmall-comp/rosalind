@@ -6,16 +6,16 @@ import numpy as np
 from collections import defaultdict, deque
 
 
-def create_nodes(strings):
+def create_overlap_nodes(strings, k):
     nodes = []
 
     for label, string in strings.iteritems():
-        nodes.append((label, string[:3], string[-3:], string))
+        nodes.append((label, string[:3], string[-k:], string))
 
     return nodes
 
 
-def create_edges(nodes):
+def create_overlap_edges(nodes):
     edges = []
 
     for node in nodes:
@@ -25,12 +25,13 @@ def create_edges(nodes):
     return edges
 
 
-def degree_table(edges):
+def degree_table(edges, directed = True):
     degree = defaultdict(int)
 
     for edge in edges:
-        degree[edge[0]] += 1
         degree[edge[1]] += 1
+        if not directed:
+            degree[edge[0]] += 1
 
     return degree
 
@@ -134,27 +135,6 @@ def has_4cycles(A):
     return cycles / 8 != 0
 
 
-def depth_first_search(nodes, edges):
-    explored  = defaultdict(int)
-    count     = 0
-
-    def explore(node):
-        explored[node] += 1
-
-        for edge in edges:
-            if node == edge[0] and explored[edge[1]] == 0:
-                explore(edge[1])
-            elif node == edge[1] and explored[edge[0]] == 0:
-                explore(edge[0])
-
-    for node in nodes:
-        if explored[node] == 0:
-            explore(node)
-            count += 1
-
-    return count
-
-
 def breadth_first_search(s, nodes, edges):
     D = {}
 
@@ -174,6 +154,40 @@ def breadth_first_search(s, nodes, edges):
     return D
 
 
+def depth_first_search(s, edges, directed = True):
+    explored  = defaultdict(int)
+    traversal = []
+
+    def explore(node):
+        explored[node] += 1
+
+        for edge in edges:
+            if node == edge[0] and explored[edge[1]] == 0:
+                explore(edge[1])
+            if not directed:
+                if node == edge[1] and explored[edge[0]] == 0:
+                    explore(edge[0])
+
+        traversal.append(node)
+
+    explore(s)
+
+    return traversal
+
+
+def connected_components(nodes, edges, directed = True):
+    explored   = set()
+    components = []
+
+    for node in nodes:
+        if node not in explored:
+            component = depth_first_search(node, edges, directed)
+            explored  |= set(component)
+            components.append(component)
+
+    return components
+
+
 def bipartite(s, nodes, edges, directed = True):
     C = {}
 
@@ -191,7 +205,7 @@ def bipartite(s, nodes, edges, directed = True):
                     Q.append(edge[1])
                     C[edge[1]] = 1 - C[u]
                 elif C[edge[1]] == C[u]:
-                    return -1
+                    return False
 
             if not directed:
                 if u == edge[1]:
@@ -199,9 +213,9 @@ def bipartite(s, nodes, edges, directed = True):
                         Q.append(edge[0])
                         C[edge[0]] = 1 - C[u]
                     elif C[edge[0]] == C[u]:
-                        return -1
+                        return False
 
-    return 1
+    return True
 
 
 def cyclic(nodes, edges):
@@ -225,9 +239,9 @@ def cyclic(nodes, edges):
 
     for node in nodes:
         if detect_cycles(node):
-            return -1
+            return False
 
-    return 1
+    return True
 
 
 def dijkstra(s, nodes, edges):
@@ -244,7 +258,7 @@ def dijkstra(s, nodes, edges):
         weighted = heapq.heappop(heap)
         for edge in edges:
             if weighted[1] == edge[0]:
-                if distance[edge[0]] + edge[2] < distance[edge[1]]:
+                if distance[edge[1]] > distance[edge[0]] + edge[2]:
                     distance[edge[1]] = distance[edge[0]] + edge[2]
                     if (edge[2], edge[1]) in heap:
                         heap.remove((edge[2], edge[1]))
@@ -256,7 +270,6 @@ def dijkstra(s, nodes, edges):
 
 def bellman_ford(s, nodes, edges):
     distances = {}
-    updated   = False
 
     for node in nodes:
         distances[node] = float('inf')
@@ -264,6 +277,7 @@ def bellman_ford(s, nodes, edges):
     distances[s] = 0
 
     for _ in xrange(len(nodes) - 1):
+        updated = False
         for u, v, w in edges:
             if distances[v] > distances[u] + w:
                 distances[v] = distances[u] + w
@@ -272,7 +286,240 @@ def bellman_ford(s, nodes, edges):
         if not updated:
             break
 
+    for u, v, w in edges:
+        if distances[v] > distances[u] + w:
+            return None
+
     return distances
+
+
+def topological_sort(nodes, edges):
+    ordering = []
+    explored = defaultdict(int)
+
+    def topological(node):
+        explored[node] += 1
+
+        for edge in edges:
+            if node == edge[0] and explored[edge[1]] == 0:
+                topological(edge[1])
+
+        ordering.append(node)
+
+    for node in nodes:
+        if explored[node] == 0:
+            topological(node)
+
+    return ordering[::-1]
+
+
+def hamiltonian_path(nodes, edges):
+    ordering = topological_sort(nodes, edges)
+
+    for i in xrange(len(ordering) - 1):
+        if (ordering[i], ordering[i + 1]) not in edges:
+            return []
+
+    return ordering
+
+
+def negative_weight_cycle(nodes, edges):
+    visited = set()
+
+    for node in nodes:
+        if node not in visited:
+            distances = bellman_ford(node, nodes, edges)
+            if distances:
+                for d in distances:
+                    if distances[d] != float('inf'):
+                        visited.add(d)
+            else:
+                return True
+
+    return False
+
+
+def tarjan(nodes, edges):
+    index      = {}
+    lowlink    = {}
+    stack      = []
+    components = []
+
+    counter    = [0]
+
+    def scc(node):
+        index[node]   = counter[0]
+        lowlink[node] = counter[0]
+        counter[0]   += 1
+
+        stack.append(node)
+
+        for edge in edges:
+            if node == edge[0]:
+                head = edge[1]
+                if head not in index:
+                    scc(head)
+                    lowlink[node] = min(lowlink[node], lowlink[head])
+                elif head in stack:
+                    lowlink[node] = min(lowlink[node], index[head])
+
+        if lowlink[node] == index[node]:
+            component  = []
+            while node not in component:
+                component.append(stack.pop())
+            components.append(component)
+
+    for node in nodes:
+        if node not in index:
+            scc(node)
+
+    return components
+
+
+def kosaraju(nodes, edges):
+    transpose  = [(edge[1], edge[0]) for edge in edges]
+    explored   = defaultdict(int)
+    stack      = []
+    component  = []
+    components = []
+
+    def ordering(node):
+        explored[node] += 1
+
+        for edge in edges:
+            if node == edge[0] and explored[edge[1]] == 0:
+                ordering(edge[1])
+
+        stack.append(node)
+
+    def scc(node):
+        explored[node] += 1
+
+        for edge in transpose:
+            if node == edge[0] and explored[edge[1]] == 0:
+                scc(edge[1])
+
+        component.append(node)
+
+
+    for node in nodes:
+        if explored[node] == 0:
+            ordering(node)
+
+    explored  = defaultdict(int)
+
+    while stack:
+        node = stack.pop()
+
+        if explored[node] == 0:
+            scc(node)
+
+        if component:
+            components.append(component)
+            component = []
+
+    return components
+
+
+def two_satisfiable(nodes, edges):
+    variables   = nodes + [-n for n in nodes]
+    clauses     = [(-a, b) for a, b in edges] + [(-b, a) for a, b in edges]
+    components  = tarjan(variables, clauses)
+
+    assigned    = set()
+
+    for component in components:
+        for node in component:
+            if -node in component:
+                return []
+            if abs(node) not in assigned:
+                nodes[abs(node) - 1] = node
+                assigned.add(abs(node))
+
+    return nodes
+
+
+def component_graph(components, edges):
+    length     = len(components)
+
+    cnodes     = [i + 1 for i in xrange(length)]
+    cedges     = set()
+
+    for edge in edges:
+        ctail = filter(lambda x: edge[0] in x and edge[1] not in x, components)
+        chead = filter(lambda x: edge[1] in x and edge[0] not in x, components)
+        if ctail and chead:
+            cedges.add((components.index(ctail[0]) + 1, components.index(chead[0]) + 1))
+
+    return cnodes, cedges
+
+
+'''
+    here is the recommended way to find a general sink, or 
+    mother vertex. I came up with my own algorithm that is 
+    much quicker:
+
+    1) topological sort graph
+    2) choose first node - with in degree 0
+    3) get distance from this node to others in graph - bfs 
+    4) if any node unreachable, node not a general sink
+    5) if all nodes reachable, node a general sink
+
+    I retain this version for reference.
+
+    def general_sink(nodes, edges):
+        components     = tarjan(nodes, edges)
+        cnodes, cedges = component_graph(components, edges)
+        degrees        = degree_table(cedges)
+
+        candidates = [n for n in cnodes if degrees[n] == 0]
+        if len(candidates) == 1:
+            return components[candidates[0] - 1][0]
+        else:
+            return -1
+
+'''
+
+def general_sink(nodes, edges):
+    topological = topological_sort(nodes, edges)
+    source      = topological[0]
+    distances   = breadth_first_search(source, nodes, edges)
+
+    if filter(lambda x: distances[x] == -1, distances):
+        return -1
+    else:
+        return source
+
+
+def semi_connected(nodes, edges):
+    components     = tarjan(nodes, edges)
+    cnodes, cedges = component_graph(components, edges)
+    cnodes         = topological_sort(cnodes, cedges)
+
+    for i in xrange(1, len(cnodes)):
+        if (cnodes[i - 1], cnodes[i]) not in cedges:
+            return False
+
+    return True
+
+
+def shortest_path(s, nodes, edges):
+    distances = {}
+    nodes     = topological_sort(nodes, edges)
+
+    for node in nodes:
+        distances[node] = float('inf')
+
+    distances[s] = 0
+
+    for node in nodes:
+        for u, v, w in edges:
+            if node == u:
+                if distances[v] > distances[u] + w:
+                    distances[v] = distances[u] + w
+
+    return distances
+
 
 
 def floyd_warshall(nodes, edges):
@@ -293,5 +540,4 @@ def floyd_warshall(nodes, edges):
                     D[i][j] = D[i][k] + D[k][j]
 
     return D
-
 

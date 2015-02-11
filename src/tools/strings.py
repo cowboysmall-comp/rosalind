@@ -238,11 +238,11 @@ def interwoven_sequences(string1, string2):
 
     if string1:
         for sequence in interwoven_sequences(string1[1:], string2):
-                sequences.add(string1[0] + sequence)
+            sequences.add(string1[0] + sequence)
 
     if string2:
         for sequence in interwoven_sequences(string1, string2[1:]):
-                sequences.add(string2[0] + sequence)
+            sequences.add(string2[0] + sequence)
 
     return sequences
 
