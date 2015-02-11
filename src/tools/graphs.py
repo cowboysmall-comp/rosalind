@@ -182,7 +182,7 @@ def connected_components(nodes, edges, directed = True):
     for node in nodes:
         if node not in explored:
             component = depth_first_search(node, edges, directed)
-            explored  |= set(component)
+            explored |= set(component)
             components.append(component)
 
     return components
@@ -496,8 +496,8 @@ def semi_connected(nodes, edges):
     cnodes, cedges = component_graph(components, edges)
     cnodes         = topological_sort(cnodes, cedges)
 
-    for i in xrange(1, len(cnodes)):
-        if (cnodes[i - 1], cnodes[i]) not in cedges:
+    for i in xrange(len(cnodes) - 1):
+        if (cnodes[i], cnodes[i + 1]) not in cedges:
             return False
 
     return True
