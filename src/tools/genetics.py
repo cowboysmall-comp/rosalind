@@ -5,7 +5,6 @@ from itertools   import product
 
 
 DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
-
 RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
 
 
@@ -171,7 +170,6 @@ def perfect_matchings(rna):
                 for i in xrange(1, len(rna), 2):
                     if rna[0] == RNA_COMPLEMENT[rna[i]]:
                         A[rna] += match(rna[1:i]) * match(rna[i + 1:])
-                        A[rna] %= 1000000
 
         return A[rna]
 
@@ -190,7 +188,6 @@ def matchings(rna):
             for i in xrange(1, len(rna)):
                 if rna[0] == RNA_COMPLEMENT[rna[i]]:
                     A[rna] += match(rna[1:i]) * match(rna[i + 1:])
-                    A[rna] %= 1000000
 
         return A[rna]
 
@@ -238,6 +235,16 @@ def protein_weight(protein, table):
         total += table[p]
 
     return total
+
+
+def complete_spectrum(protein, table):
+    S = []
+
+    for i in xrange(1, len(protein) + 1):
+        S.append(protein_weight(protein[:i], table))
+        S.append(protein_weight(protein[-i:], table))
+
+    return S
 
 
 def count_rnas_from_protein(protein, table):

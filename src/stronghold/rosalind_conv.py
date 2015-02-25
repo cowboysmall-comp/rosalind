@@ -17,6 +17,5 @@ def main(argv):
     print abs(float(maximum))
 
 
-
 if __name__ == "__main__":
     main(sys.argv[1:])

@@ -2,14 +2,14 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-import fasta
-import strings
+import files
+import combinatorics
 
 
 def main(argv):
-    s, t = fasta.read_ordered(argv[0])
+    n   = files.read_int(argv[0])
 
-    print '%s\n%s\n%s' % strings.optimal_basic_alignment(s, t)
+    print combinatorics.double_factorial(2 * n - 5) % 1000000
 
 
 if __name__ == "__main__":

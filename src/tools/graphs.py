@@ -10,7 +10,7 @@ def create_overlap_nodes(strings, k):
     nodes = []
 
     for label, string in strings.iteritems():
-        nodes.append((label, string[:3], string[-k:], string))
+        nodes.append((label, string[:k], string[-k:], string))
 
     return nodes
 
@@ -218,7 +218,7 @@ def bipartite(s, nodes, edges, directed = True):
     return True
 
 
-def cyclic(nodes, edges):
+def acyclic(nodes, edges):
     explored  = defaultdict(int)
     colour    = defaultdict(int)
 

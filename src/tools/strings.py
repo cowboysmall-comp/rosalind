@@ -1,12 +1,13 @@
+from collections import defaultdict
 from itertools import combinations
 
 
-MATCH    = 0
-MISMATCH = 1
-GAP      = 1
+MATCH    =  0
+MISMATCH = -1
+GAP      = -1
 
 
-def alignment_table(s, t):
+def basic_alignment_table(s, t):
     m = len(s)
     n = len(t)
 
@@ -20,20 +21,17 @@ def alignment_table(s, t):
 
     for i in xrange(1, m + 1):
         for j in xrange(1, n + 1):
-            if s[i - 1] == t[j - 1]:
-                T[i][j] = T[i - 1][j - 1] + MATCH
-            else:
-                T[i][j] = min(T[i - 1][j - 1] + MISMATCH, T[i - 1][j] + GAP, T[i][j - 1] + GAP)
+            T[i][j] = max(T[i - 1][j - 1] + (MATCH if s[i - 1] == t[j - 1] else MISMATCH), T[i - 1][j] + GAP, T[i][j - 1] + GAP)
 
     return T
 
 
-def optimal_alignment(s, t):
+def optimal_basic_alignment(s, t):
     m   = len(s)
     n   = len(t)
 
-    T   = alignment_table(s, t)
-    e_d = T[m][n]
+    T   = basic_alignment_table(s, t)
+    e_d = -T[m][n]
 
     s_a = []
     t_a = []
@@ -54,6 +52,79 @@ def optimal_alignment(s, t):
             n -= 1
 
     return e_d, ''.join(s_a), ''.join(t_a)
+
+
+def count_basic_alignments(s, t):
+    m   = len(s)
+    n   = len(t)
+
+    T   = basic_alignment_table(s, t)
+    V   = defaultdict(int)
+
+    def alignments(m, n):
+        if m != 0 and n != 0:
+            if (m, n) not in V:
+                total = 0
+                if T[m][n] == T[m - 1][n] + GAP:
+                    total += alignments(m - 1, n)
+                if T[m][n] == T[m][n - 1] + GAP:
+                    total += alignments(m, n - 1)
+                if T[m][n] == T[m - 1][n - 1] + (MATCH if s[m - 1] == t[n - 1] else MISMATCH):
+                    total += alignments(m - 1, n - 1)
+                V[(m, n)] = total
+            return V[(m, n)]
+        else:
+            return 1
+
+    return alignments(m, n)
+
+
+def alignment_table(s, t, scoring, gap = -5):
+    m = len(s)
+    n = len(t)
+
+    T = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        T[i][0] = gap * i
+
+    for j in xrange(1, n + 1):
+        T[0][j] = gap * j
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            T[i][j] = max(T[i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], T[i - 1][j] + gap, T[i][j - 1] + gap)
+
+    return T
+
+
+def optimal_alignment(s, t, scoring, gap = -5):
+    m   = len(s)
+    n   = len(t)
+
+    T   = alignment_table(s, t)
+    e_d = T[m][n]
+
+    s_a = []
+    t_a = []
+
+    while m != 0 and n != 0:
+        if T[m][n] == T[m - 1][n] + gap:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif T[m][n] == T[m][n - 1] + gap:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        elif T[m][n] == T[m - 1][n - 1] + scoring[s[m - 1]][t[n - 1]]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            m -= 1
+            n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
 
 
 def failure_array(string):

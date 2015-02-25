@@ -14,7 +14,7 @@ def main(argv):
         n, m  = G[:2]
         edges = G[2]
         nodes = [n for n in xrange(1, n + 1)]
-        C.append(graphs.cyclic(nodes, edges))
+        C.append(graphs.acyclic(nodes, edges))
 
     print ' '.join('1' if C[n] else '-1' for n in xrange(k))
 

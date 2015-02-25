@@ -9,6 +9,13 @@ def permutations(n, r):
     return math.factorial(n) / math.factorial(n - r)
 
 
+def double_factorial(n):
+    if n % 2 == 0:
+        return 2 ** (n / 2) * math.factorial(n / 2)
+    else:
+        return math.factorial(n) / double_factorial(n - 1)
+
+
 def fibonacci(n):
     fib = [0, 1]
     for _ in xrange(2, n + 1):

@@ -9,7 +9,7 @@ import strings
 def main(argv):
     s, t = fasta.read_ordered(argv[0])
 
-    print '%s\n%s\n%s' % strings.optimal_basic_alignment(s, t)
+    print strings.count_basic_alignments(s, t) % 134217727
 
 
 if __name__ == "__main__":

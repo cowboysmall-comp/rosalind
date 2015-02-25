@@ -46,3 +46,17 @@ def reverse_mass(file_path):
 
     return lookup
 
+
+def blosom62_scoring(file_path):
+    matrix = defaultdict(dict)
+
+    with open(file_path) as file:
+        cols = file.readline().strip().split()
+        for line in file:
+            items = line.strip().split()
+            row   = items[0]
+            for i, value in enumerate(items[1:]):
+                matrix[row][cols[i]] = int(value)
+
+    return matrix
+            
