@@ -2,11 +2,11 @@
 
 class Node:
 
-    def __init__(self, label):
+    def __init__(self, label, children = None):
         self.label    = label
         self.data     = None
         self.parent   = None
-        self.children = []
+        self.children = children if children else []
 
 
     def get_root(self):
@@ -44,6 +44,49 @@ class Node:
 
     def __repr__(self):
         return self.__str__()
+
+
+
+class SuffixTree:
+
+    def __init__(self, string):
+        self.root = Node(string)
+        for i in xrange(1, len(string)):
+            self.add_child(self.root, Node(string[i:]))
+
+
+    def add_child(self, parent, node):
+        if not self.split(parent, node):
+            node.label = node.label[len(parent.label):]
+            for child in parent.children:
+                if child.label[0] == node.label[0]:
+                    return self.add_child(child, node)
+            parent.add_child(node)
+
+            
+    def split(self, parent, node):
+        length = min(len(parent.label), len(node.label))
+        for i in xrange(length):
+            if parent.label[i] != node.label[i]:
+                node.label      = node.label[i:]
+                parent.children = [Node(parent.label[i:], parent.children), node]
+                parent.label    = parent.label[:i]
+                return True
+        return False
+
+
+    def traverse(self):
+        traversal = []
+
+        def traverse_from(node):
+            if node.label:
+                traversal.append(node.label)
+            for child in node.children:
+                traverse_from(child)
+
+        traverse_from(self.root)
+
+        return traversal
 
 
 

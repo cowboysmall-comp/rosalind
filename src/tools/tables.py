@@ -36,6 +36,17 @@ def mass(file_path):
     return table
 
 
+def integer_mass(file_path):
+    table = {}
+
+    with open(file_path) as file:
+        for line in file:
+            key, value = line.strip().split()
+            table[key] = int(float(value))
+
+    return table
+
+
 def reverse_mass(file_path):
     lookup = []
 
@@ -43,6 +54,17 @@ def reverse_mass(file_path):
         for line in file:
             key, value = line.strip().split()
             lookup.append((float(value), key))
+
+    return lookup
+
+
+def reverse_integer_mass(file_path):
+    lookup = []
+
+    with open(file_path) as file:
+        for line in file:
+            key, value = line.strip().split()
+            lookup.append((int(float(value)), key))
 
     return lookup
 
