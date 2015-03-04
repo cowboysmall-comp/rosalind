@@ -325,10 +325,8 @@ def sequences_interweave(string, string1, string2):
     if len(string2) == 0:
         return string.startswith(string1)
 
-    case1 = string1[0] == string[0] and sequences_interweave(string[1:], string1[1:], string2)
-    case2 = string2[0] == string[0] and sequences_interweave(string[1:], string1, string2[1:])
-
-    return case1 or case2
+    return ((string1[0] == string[0] and sequences_interweave(string[1:], string1[1:], string2)) 
+        or  (string2[0] == string[0] and sequences_interweave(string[1:], string1, string2[1:])))
 
 
 def interwoven_matrix(string, strings):
