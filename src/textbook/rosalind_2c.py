@@ -2,8 +2,6 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from itertools import combinations, product
-
 import files
 import genetics
 import tables

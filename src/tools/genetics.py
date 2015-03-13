@@ -1,5 +1,8 @@
+import sys
 import re
 import math
+import random
+import bisect
 
 from collections import defaultdict
 from itertools   import combinations, product
@@ -31,6 +34,18 @@ def dna_to_rna(string):
     return ''.join(rna_string)
 
 
+def reverse_palindromes(string):
+    rps  = []
+
+    for i in xrange(4, 13):
+        for j in xrange(len(string) - i + 1):
+            c = string[j:j + i]
+            if c == dna_complement(c):
+                rps.append((j + 1, i))
+
+    return sorted(rps)
+
+
 def gc_content(string):
     return 100 * float(string.count('G') + string.count('C')) / len(string)
 
@@ -44,14 +59,66 @@ def gc_contents(strings):
     return contents
 
 
-def kmer_composition(string, alpha, k):
-    kmers = [''.join(p) for p in product(*[alpha] * k)]
+def list_kmers(string, k):
+    length = len(string)
+    kmers  = []
 
-    A = []
+    for i in xrange(length - k + 1):
+        kmers.append(string[i:i + k])
+
+    return sorted(kmers)
+
+
+def paired_kmers(strings):
+    kmers = []
+
+    for pairs in strings:
+        pair = pairs.split('|')
+        kmers.append((pair[0], pair[1]))
+
+    return kmers
+
+
+def reconstruct_string_from_path(path):
+    return path[0][:-1] + ''.join(p[-1] for p in path)
+
+
+def reconstruct_circular_string_from_path(path):
+    return ''.join(p[-1] for p in path[:-1])
+
+
+def reconstruct_string_from_paired_path(path, k, d):
+    string1 = reconstruct_string_from_path([p[0] for p in path])
+    string2 = reconstruct_string_from_path([p[1] for p in path])
+
+    for i in xrange(k + d + 1, len(string1)):
+        if string1[i] != string2[i - k - d]:
+            return None
+
+    return string1 + string2[-(k + d):]
+
+
+def reconstruct_strings_from_maximal_paths(maximal):
+    strings = []
+
+    for path in maximal:
+        strings.append(reconstruct_string_from_path(path))
+
+    return sorted(strings)
+
+
+def kmer_occurences(string, pattern):
+    return [i.start() for i in re.finditer(r'(?=(%s))' % pattern, string)]
+
+
+def kmer_composition(string, k):
+    kmers = [''.join(p) for p in product('ACGT', repeat = k)]
+    comp  = []
+
     for kmer in kmers:
-        A.append(len(re.findall(r'(?=(%s))' % kmer, string)))
+        comp.append(len(re.findall(r'(?=(%s))' % kmer, string)))
 
-    return A
+    return comp
 
 
 def kmer_frequency_table(string, k):
@@ -65,24 +132,14 @@ def kmer_frequency_table(string, k):
     return stats
 
 
-def kmer_frequency_table_mismatches(string, alpha, k, d):
-    kmers = [''.join(p) for p in product(*[alpha] * k)]
-    stats = {}
-
-    for kmer in kmers:
-        stats[kmer] = len(approximate_pattern_matching(kmer, string, d))
-
-    return stats
-
-
-def kmer_frequency_table_mismatches_and_complements(string, alpha, k, d):
-    kmers = [''.join(p) for p in product(*[alpha] * k)]
+def kmer_frequency_table_mismatches(string, k, d, complements = False):
+    kmers = [''.join(p) for p in product('ACGT', repeat = k)]
     stats = defaultdict(int)
 
     for kmer in kmers:
-        count1 = len(approximate_pattern_matching(kmer, string, d))
-        count2 = len(approximate_pattern_matching(dna_complement(kmer), string, d))
-        stats[kmer] = count1 + count2
+        stats[kmer] = len(approximate_pattern_matching(kmer, string, d))
+        if complements:
+            stats[kmer] += len(approximate_pattern_matching(dna_complement(kmer), string, d))
 
     return stats
 
@@ -372,6 +429,25 @@ def encode_protein(rna, table):
     return encode
 
 
+def encode_protein_from_orf(rna, table):
+    encoded = []
+
+    for match in re.compile(r'(?=(AUG))').finditer(rna):
+        sub    = rna[match.start():]
+        encode = ''
+
+        for chunk in [sub[i:i + 3] for i in xrange(0, len(sub), 3)]:
+            if len(chunk) == 3:
+                amino = table[chunk]
+                if amino != 'Stop':
+                    encode += amino
+                else:
+                    encoded.append(encode)
+                    break
+
+    return encoded
+
+
 def protein_mass(protein, table):
     total = 0.0
 
@@ -379,6 +455,29 @@ def protein_mass(protein, table):
         total += table[p]
 
     return total
+
+
+def spectrum_graph(masses, table):
+    edges = []
+
+    for i in xrange(len(masses) - 1):
+        for j in xrange(i, len(masses)):
+            found = filter(lambda x: abs(x[0] - (masses[j] - masses[i])) < 0.0001, table)
+            if found:
+                edges.append((masses[i], masses[j], found[0][1]))
+
+    return edges
+
+
+def longest_protein(nodes, edges):
+    proteins = defaultdict(str)
+
+    for node in nodes:
+        for edge in filter(lambda x: x[1] == node, edges):
+            if len(proteins[node]) < len(proteins[edge[0]]) + 1:
+                proteins[node] = proteins[edge[0]] + edge[2]
+
+    return max(proteins.values(), key = len)
 
 
 def complete_spectrum(protein, table):
@@ -440,22 +539,6 @@ def matching_peptides(masses, spectrum, table):
 
     return matches
 
-
-'''
-    LEADERBOARDCYCLOPEPTIDESEQUENCING(Spectrum, N)
-            Leaderboard = {0-peptide}
-            LeaderPeptide = 0-peptide
-            while Leaderboard is non-empty
-                Leaderboard = Expand(Leaderboard)
-                for each Peptide in Leaderboard
-                    if Mass(Peptide) = ParentMass(Spectrum)
-                        if Score(Peptide, Spectrum) > Score(LeaderPeptide, Spectrum)
-                            LeaderPeptide = Peptide
-                    else if Mass(Peptide) > ParentMass(Spectrum)
-                        remove Peptide from Leaderboard
-                Leaderboard = Cut(Leaderboard, Spectrum, N)
-            output LeaderPeptide
-'''
 
 def leaderboard_matching_peptides(masses, spectrum, N, table):
     leader  = (0, [])
@@ -523,6 +606,280 @@ def convolution_frequent(counts, M):
         M += 1
 
     return [[item[1]] for item in ordered[:M]]
+
+
+def kmer_candidates(strings, k):
+    candidates = []
+
+    for string in strings:
+        length = len(string)
+        for i in xrange(length - k + 1):
+            candidates.append(string[i:i + k])
+
+    return candidates
+
+
+def sigma_distance(strings, kmer):
+    k    = len(kmer)
+    dist = 0
+
+    for string in strings:
+        hamming = sys.maxint
+        length  = len(string)
+        for i in xrange(length - k + 1):
+            d = distance.hamming(kmer, string[i:i + k])
+            if hamming > d:
+                hamming = d
+        dist += hamming
+
+    return dist
+
+
+def median_string(strings, k):
+    kmers  = kmer_candidates(strings, k)
+
+    dist   = sys.maxint
+    median = None
+
+    for kmer in kmers:
+        d = sigma_distance(strings, kmer)
+        if dist >= d:
+            dist   = d
+            median = kmer
+
+    return median
+
+
+def profile_most_kmer(text, profile, k):
+    length  = len(text)
+
+    maximum = -float('inf')
+    kmer    = None
+
+    for i in xrange(length - k + 1):
+        string = text[i:i + k]
+
+        total  = 1.0
+        for j, c in enumerate(string):
+            total *= profile[c][j]
+
+        if maximum < total:
+            maximum = total
+            kmer    = string
+
+    return kmer
+
+
+def profile_most_kmers(strings, profile, k):
+    kmers = []
+
+    for string in strings:
+        kmers.append(profile_most_kmer(string, profile, k))
+
+    return kmers
+
+
+def profile_matrix(strings, k, pseudocounts = False):
+    length  = len(strings) + 4 if pseudocounts else len(strings)
+    profile = {c:[1.0 / float(length) if pseudocounts else 0.0 for _ in xrange(k)] for c in 'ACGT'}
+
+    for string in strings:
+        for i in xrange(k):
+            profile[string[i]][i] += (1.0 / float(length))
+
+    return profile
+
+
+def consensus(strings, k):
+    kmer = ''
+
+    for i in xrange(k):
+        counter = defaultdict(int)
+
+        for string in strings:
+            counter[string[i]] += 1
+
+        kmer += max(counter, key = counter.get)
+
+    return kmer
+
+
+def score(strings, k):
+    dist = 0
+    kmer = consensus(strings, k)
+
+    for string in strings:
+        dist += distance.hamming(string, kmer)
+
+    return dist
+
+
+def greedy_motif_search(strings, k, pseudocounts = False):
+    bmotifs = [string[:k] for string in strings]
+    bscore  = score(bmotifs, k)
+
+    first   = strings[0]
+    rest    = strings[1:]
+    length  = len(first)
+
+    for i in xrange(length - k + 1):
+        cmotifs = [first[i:i + k]]
+
+        for string in rest:
+            profile = profile_matrix(cmotifs, k, pseudocounts)
+            cmotifs.append(profile_most_kmer(string, profile, k))
+
+        cscore = score(cmotifs, k)
+        if cscore < bscore:
+            bmotifs = cmotifs
+            bscore  = cscore
+
+    return bmotifs
+
+
+def randomized_kmer(string, k):
+    length = len(string)
+    i      = random.randint(0, length - k)
+    return string[i:i + k]
+
+
+def randomized_kmers(strings, k):
+    kmers  = []
+
+    for string in strings:
+        kmers.append(randomized_kmer(string, k))
+
+    return kmers
+
+
+def randomized_motif_search(strings, k, pseudocounts = False):
+    motifs  = randomized_kmers(strings, k)
+
+    bmotifs = motifs
+    bscore  = score(motifs, k)
+
+    while True:
+        profile = profile_matrix(motifs, k, pseudocounts)
+        motifs  = profile_most_kmers(strings, profile, k)
+        cscore  = score(motifs, k)
+
+        if bscore > cscore:
+            bmotifs = motifs
+            bscore  = cscore
+        else:
+            return bmotifs, bscore
+
+
+def randomized_motif_search_with_iterations(strings, k, iterations, pseudocounts = False):
+    bmotifs = None
+    bscore  = sys.maxint
+    count   = 0
+
+    while count < iterations:
+        cmotifs, cscore = randomized_motif_search(strings, k, pseudocounts)
+
+        if bscore > cscore:
+            bscore  = cscore
+            bmotifs = cmotifs
+
+        count += 1
+
+    return bmotifs
+
+
+def profile_random_kmer(text, profile, k):
+    length  = len(text)
+    kmers   = []
+    totals  = []
+    total   = 0
+
+    for i in xrange(length - k + 1):
+        string  = text[i:i + k]
+
+        current = 1.0
+        for j, c in enumerate(string):
+            current *= profile[c][j]
+
+        total  += current
+
+        kmers.append(string)
+        totals.append(total)
+
+    return kmers[bisect.bisect(totals, random.random() * total)]
+
+
+def profile_random_kmers(text, profile, k):
+    kmers  = []
+
+    for string in strings:
+        kmers.append(profile_random_kmer(string, profile, k))
+
+    return kmers
+
+
+def gibbs_sampler(strings, k, t, N, pseudocounts = False):
+    motifs  = randomized_kmers(strings, k)
+
+    bmotifs = motifs
+    bscore  = score(motifs, k)
+
+    for j in xrange(N):
+        i       = random.randrange(t)
+        start   = motifs[:i]
+        end     = motifs[i + 1:]
+
+        profile = profile_matrix(start + end, k, pseudocounts)
+        motif   = profile_random_kmer(strings[i], profile, k)
+
+        motifs  = start + [motif] + end
+        cscore  = score(motifs, k)
+
+        if bscore > cscore:
+            bmotifs = motifs
+            bscore  = cscore
+
+    return bmotifs, bscore
+
+
+def gibbs_sampler_with_iterations(strings, k, t, N, iterations, pseudocounts = False):
+    bmotifs = None
+    bscore  = sys.maxint
+    count   = 0
+
+    while count < iterations:
+        cmotifs, cscore = gibbs_sampler(strings, k, t, N, pseudocounts)
+
+        if bscore > cscore:
+            bscore  = cscore
+            bmotifs = cmotifs
+
+        count += 1
+
+    return bmotifs
+
+
+def infer_peptides_from_spectrum(spectrum, table):
+    protein = ''
+
+    for i in xrange(1, len(spectrum)):
+        protein += filter(lambda x: abs(x[0] - (spectrum[i] - spectrum[i - 1])) < 0.0001, table)[0][1]
+
+    return protein
+
+
+def infer_peptides_from_masses(masses, table, length):
+    peptide = ''
+    masses  = [m - masses[0] for m in masses[1:]]
+
+    while len(peptide) < length:
+        for i in xrange(len(masses)):
+            found = filter(lambda x: abs(x[0] - masses[i]) < 0.0001, table)
+            if found:
+                peptide += found[0][1]
+                masses   = [l - masses[i] for l in masses[i + 1:]]
+                break
+
+    return peptide
 
 
 def count_rnas_from_protein(protein, table):

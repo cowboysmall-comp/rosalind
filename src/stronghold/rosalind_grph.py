@@ -8,10 +8,11 @@ import graphs
 
 def main(argv):
     strings = fasta.read(argv[0])
-    nodes   = graphs.create_overlap_nodes(strings, 3)
-    edges   = graphs.create_overlap_edges(nodes)
 
-    print '\n'.join(['%s %s' % (edge) for edge in edges])
+    nodes   = graphs.labeled_overlap_nodes(strings, 3)
+    edges   = graphs.overlap_edges(nodes)
+
+    print '\n'.join('%s %s' % edge for edge in edges)
 
 
 if __name__ == "__main__":

@@ -55,11 +55,11 @@ def optimal_basic_alignment(s, t):
 
 
 def count_basic_alignments(s, t):
-    m   = len(s)
-    n   = len(t)
+    m = len(s)
+    n = len(t)
 
-    T   = basic_alignment_table(s, t)
-    V   = defaultdict(int)
+    T = basic_alignment_table(s, t)
+    V = defaultdict(int)
 
     def alignments(m, n):
         if m != 0 and n != 0:
@@ -128,8 +128,8 @@ def optimal_alignment(s, t, scoring, gap = -5):
 
 
 def failure_array(string):
-    N   = len(string)
-    T   = [0] * N
+    N = len(string)
+    T = [0] * N
 
     pos = 1
     idx = 0
@@ -359,4 +359,29 @@ def longest_substring(node, k):
                 strings.append(string)
 
     return sorted(strings)
+
+
+def find_indices_of_subsequence(s, t):
+    indices = []
+    index   = 0
+
+    for c in t:
+        index = s.find(c, index)
+        indices.append(index + 1)
+
+    return indices
+
+
+def find_indices_of_substrings(s, t):
+    indices = []
+    index   = 0
+
+    while index < len(s):
+        index = s.find(t, index)
+        if index == -1:
+            break
+        indices.append(index + 1)
+        index += 1
+
+    return indices
 

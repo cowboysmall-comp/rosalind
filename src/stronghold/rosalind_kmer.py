@@ -8,7 +8,7 @@ import genetics
 
 def main(argv):
     dna = fasta.read_one(argv[0])
-    A   = genetics.kmer_composition(dna, ['A', 'C', 'G', 'T'], 4)
+    A   = genetics.kmer_composition(dna, 4)
 
     print ' '.join(str(a) for a in A)
 

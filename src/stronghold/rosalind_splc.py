@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 import fasta
 import genetics
 import tables
-import xerox
 
 
 def main(argv):
@@ -18,10 +17,7 @@ def main(argv):
     for intron in introns:
         dna = dna.replace(intron, '')
 
-    protein = genetics.encode_protein(genetics.dna_to_rna(dna), table)
-
-    xerox.copy(protein)
-    print protein
+    print genetics.encode_protein(genetics.dna_to_rna(dna), table)
 
 
 if __name__ == "__main__":

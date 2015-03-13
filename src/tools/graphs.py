@@ -1,26 +1,64 @@
 import sys
 import heapq
+import random
 
 import numpy as np
 
 from collections import defaultdict, deque
 
 
-def create_overlap_nodes(strings, k):
+def labeled_overlap_nodes(labeled, k):
     nodes = []
 
-    for label, string in strings.iteritems():
-        nodes.append((label, string[:k], string[-k:], string))
+    for label, string in labeled.iteritems():
+        nodes.append((label, string[:k], string[-k:]))
 
     return nodes
 
 
-def create_overlap_edges(nodes):
+def overlap_nodes(strings):
+    nodes = []
+
+    for string in strings:
+        nodes.append((string, string[:-1], string[1:]))
+
+    return nodes
+
+
+def overlap_edges(nodes):
     edges = []
 
-    for node in nodes:
+    for node in sorted(nodes):
         for tail in filter(lambda x: x[1] == node[2] and x != node, nodes):
             edges.append((node[0], tail[0]))
+
+    return edges
+
+
+def nodes_from_edges(edges):
+    nodes = set()
+
+    for edge in edges:
+        nodes.add(edge[0])
+        nodes.add(edge[1])
+
+    return sorted(list(nodes))
+
+
+def debruijn_graph(kmers):
+    edges = []
+
+    for kmer in kmers:
+        edges.append((kmer[:-1], kmer[1:]))
+
+    return edges
+
+
+def debruijn_paired_graph(pairs):
+    edges = []
+
+    for pair in pairs:
+        edges.append(((pair[0][:-1], pair[1][:-1]), (pair[0][1:], pair[1][1:])))
 
     return edges
 
@@ -34,6 +72,17 @@ def degree_table(edges, directed = True):
             degree[edge[0]] += 1
 
     return degree
+
+
+def edges_from_adjacency_list(adjacency, seperator1 = ' -> ', seperator2 = ','):
+    edges = []
+
+    for line in adjacency:
+        edge = line.split(seperator1)
+        for head in edge[1].split(seperator2):
+            edges.append((edge[0], head))
+
+    return edges
 
 
 def adjacency_table(edges, directed = True):
@@ -321,6 +370,107 @@ def hamiltonian_path(nodes, edges):
             return []
 
     return ordering
+
+
+def eulerian_cycle(start, edges):
+    path  = []
+    edges = edges[:]
+    stack = [start]
+
+    while stack:
+        incident = filter(lambda x: x[0] == stack[-1], edges)
+        if incident:
+            edges.remove(incident[0])
+            stack.append(incident[0][1])
+        else:
+            path.insert(0, stack.pop())
+
+    return path
+
+
+def start_eulerian_path(edges):
+    ins   = degree_table(edges)
+    outs  = degree_table([(edge[1], edge[0]) for edge in edges])
+
+    start = [node for node in outs if outs[node] - ins[node] == 1]
+    end   = [node for node in ins  if ins[node] - outs[node] == 1]
+
+    if len(start) == 1 and len(end) == 1:
+        return start[0]
+    else:
+        return None
+
+
+def eulerian_path(edges):
+    start = start_eulerian_path(edges)
+
+    if start:
+        return eulerian_cycle(start, edges)
+    else:
+        return []
+
+
+def eulerian_paired_path(edges, k, d):
+    path  = []
+
+    def candidate(node):
+        return len(path) < k + d or node[0][-1] == path[len(path) - (k + d)][1][-1]
+
+    def explore(node):
+        path.append(node)
+
+        incident = filter(lambda x: x[0] == node, edges)
+        if incident:
+            for edge in incident:
+                if candidate(edge[1]):
+                    return explore(edge[1])
+            return False
+        else:
+            return True
+
+    start = start_eulerian_path(edges)
+
+    if start and explore(start):
+        return path
+    else:
+        return []
+
+
+def one_in_one_out(nodes, edges):
+    ins  = degree_table(edges)
+    outs = degree_table([(edge[1], edge[0]) for edge in edges])
+
+    return [node for node in nodes if outs[node] == 1 and ins[node] == 1]
+
+
+def maximal_non_branching_paths(edges):
+    edges = edges[:]
+    nodes = nodes_from_edges(edges)
+    ones  = one_in_one_out(nodes, edges)
+    paths = []
+
+    for node in nodes:
+        if node not in ones:
+            for edge in filter(lambda x: x[0] == node, edges):
+                edges.remove(edge)
+                nbpath  = [edge[0], edge[1]]
+                current = edge[1]
+                while current in ones:
+                    outgoing = filter(lambda x: x[0] == current, edges)[0]
+                    current  = outgoing[1]
+                    edges.remove(outgoing)
+                    nbpath.append(outgoing[1])
+                paths.append(nbpath)
+
+    edges = [edge for edge in edges if edge[0] in ones and edge[1] in ones]
+
+    while edges:
+        cycle = eulerian_cycle(edges[0], edges)
+        for edge in cycle:
+            edges.remove(edge)
+        paths.append(cycle)
+
+    return paths
 
 
 def negative_weight_cycle(nodes, edges):

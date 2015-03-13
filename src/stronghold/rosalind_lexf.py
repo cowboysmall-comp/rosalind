@@ -8,7 +8,7 @@ def main(argv):
         alpha = file.readline().split()
         n     = int(file.readline().strip())
 
-        print '\n'.join([''.join(p) for p in product(alpha, repeat = n)])
+        print '\n'.join(''.join(p) for p in product(alpha, repeat = n))
 
 
 if __name__ == "__main__":

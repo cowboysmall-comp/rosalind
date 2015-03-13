@@ -20,10 +20,6 @@ def create_table(tree):
     names = sorted(tree.get_leaf_names())
     table = []
 
-    print ' '.join(name for name in names)
-    print tree
-    print
-
     for node in tree.get_descendants():
         if not node.is_leaf():
             table.append(create_row(node, names))

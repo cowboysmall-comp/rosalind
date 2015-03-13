@@ -11,7 +11,7 @@ def main(argv):
     text  = lines[0]
     k, d  = [int(i) for i in lines[1].split()]
 
-    table = genetics.kmer_frequency_table_mismatches(text, ['A', 'C', 'G', 'T'], k, d)
+    table = genetics.kmer_frequency_table_mismatches(text, k, d)
     freq  = genetics.kmer_reverse_frequency_table(table)
 
     print ' '.join(sorted(freq[max(freq)]))
