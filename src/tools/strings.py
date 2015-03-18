@@ -36,7 +36,7 @@ def optimal_basic_alignment(s, t):
     s_a = []
     t_a = []
 
-    while m != 0 and n != 0:
+    while m + n > 0:
         if T[m][n] == T[m - 1][n] + GAP:
             s_a.insert(0, s[m - 1])
             t_a.insert(0, '-')
@@ -102,13 +102,13 @@ def optimal_alignment(s, t, scoring, gap = -5):
     m   = len(s)
     n   = len(t)
 
-    T   = alignment_table(s, t)
+    T   = alignment_table(s, t, scoring, gap)
     e_d = T[m][n]
 
     s_a = []
     t_a = []
 
-    while m != 0 and n != 0:
+    while m + n > 0:
         if T[m][n] == T[m - 1][n] + gap:
             s_a.insert(0, s[m - 1])
             t_a.insert(0, '-')
@@ -125,6 +125,206 @@ def optimal_alignment(s, t, scoring, gap = -5):
 
     return e_d, ''.join(s_a), ''.join(t_a)
 
+
+def local_alignment_table(s, t, scoring, gap = -5):
+    m       = len(s)
+    n       = len(t)
+
+    table   = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    maximum = (0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            table[i][j] = max(table[i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], table[i - 1][j] + gap, table[i][j - 1] + gap, 0)
+            if maximum[0] < table[i][j]:
+                maximum = (table[i][j], i, j)
+
+    return table, maximum
+
+
+def local_alignment(s, t, scoring, gap = -5):
+    T, M = local_alignment_table(s, t, scoring, gap)
+
+    e_d  = M[0]
+    m, n = M[1:]
+
+    s_a  = []
+    t_a  = []
+
+    while T[m][n] > 0:
+        if T[m][n] == T[m - 1][n] + gap:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif T[m][n] == T[m][n - 1] + gap:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        elif T[m][n] == T[m - 1][n - 1] + scoring[s[m - 1]][t[n - 1]]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            m -= 1
+            n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
+
+def fitting_alignment_table(s, t):
+    m       = len(s)
+    n       = len(t)
+
+    table   = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    maximum = (0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            table[i][j] = max(table[i - 1][j - 1] + (1 if s[i - 1] == t[j - 1] else -1), table[i - 1][j] - 1, table[i][j - 1] - 1)
+            if i >= n and j >= n and maximum[0] < table[i][j]:
+                maximum = (table[i][j], i, j)
+
+    return table, maximum
+
+
+def fitting_alignment(s, t):
+    T, M = fitting_alignment_table(s, t)
+
+    e_d  = M[0]
+    m, n = M[1:]
+
+    s_a  = []
+    t_a  = []
+
+    while m > 0 and n > 0:
+        if T[m][n] == T[m - 1][n] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif T[m][n] == T[m][n - 1] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        elif T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -1):
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            m -= 1
+            n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
+
+def overlap_alignment_table(s, t):
+    m       = len(s)
+    n       = len(t)
+
+    table   = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    maximum = (0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            table[i][j] = max(table[i - 1][j - 1] + (1 if s[i - 1] == t[j - 1] else -2), table[i - 1][j] - 2, table[i][j - 1] - 2)
+
+    for j in xrange(n, 0, -1):
+        if maximum[0] < table[m][j]:
+            maximum = (table[m][j], m, j)
+
+    return table, maximum
+
+
+def overlap_alignment(s, t):
+    T, M = overlap_alignment_table(s, t)
+
+    e_d  = M[0]
+    m, n = M[1:]
+
+    s_a  = []
+    t_a  = []
+
+    while n > 0:
+        if T[m][n] == T[m - 1][n] - 2:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif T[m][n] == T[m][n - 1] - 2:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        elif T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -2):
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            m -= 1
+            n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
+
+def affine_gap_alignment_table(s, t, scoring, sigma = -11, epsilon = -1):
+    m       = len(s)
+    n       = len(t)
+
+    table   = [[[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)] for _ in xrange(3)]
+
+    maximum = (0, 0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        table[0][i][0] = sigma + (i - 1) * epsilon
+        table[1][i][0] = sigma + (i - 1) * epsilon
+        table[2][i][0] = sigma + (i - 1) * epsilon
+
+    for j in xrange(1, n + 1):
+        table[0][0][j] = sigma + (j - 1) * epsilon
+        table[1][0][j] = sigma + (j - 1) * epsilon
+        table[2][0][j] = sigma + (j - 1) * epsilon
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            table[0][i][j] = max(table[0][i - 1][j] + epsilon, table[1][i - 1][j] + sigma)
+            table[2][i][j] = max(table[2][i][j - 1] + epsilon, table[1][i][j - 1] + sigma)
+            table[1][i][j] = max(table[0][i][j], table[1][i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], table[2][i][j])
+
+    for i in xrange(3):
+        if maximum[0] < table[i][m][n]:
+            maximum = (table[i][m][n], i, m, n)
+
+    return table, maximum
+
+
+def affine_gap_alignment(s, t, scoring, sigma = -11, epsilon = -1):
+    T, M    = affine_gap_alignment_table(s, t, scoring, sigma, epsilon)
+
+    e_d     = M[0]
+    l, m, n = M[1:]
+
+    s_a     = []
+    t_a     = []
+
+    while m > 0 and n > 0:
+        if l == 0:
+            if T[0][m][n] == T[1][m - 1][n] + sigma:
+                l = 1
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif l == 2:
+            if T[2][m][n] == T[1][m][n - 1] + sigma:
+                l = 1
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        else:
+            if T[1][m][n] == T[0][m][n]:
+                l = 0
+            elif T[1][m][n] == T[2][m][n]:
+                l = 2
+            else:
+                s_a.insert(0, s[m - 1])
+                t_a.insert(0, t[n - 1])
+                m -= 1
+                n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
 
 
 def failure_array(string):

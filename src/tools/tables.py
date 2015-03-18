@@ -69,7 +69,7 @@ def reverse_integer_mass(file_path):
     return lookup
 
 
-def blosom62_scoring(file_path):
+def scoring(file_path):
     matrix = defaultdict(dict)
 
     with open(file_path) as file:

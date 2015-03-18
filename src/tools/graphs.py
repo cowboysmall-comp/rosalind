@@ -1,6 +1,7 @@
 import sys
 import heapq
 import random
+import re
 
 import numpy as np
 
@@ -74,13 +75,33 @@ def degree_table(edges, directed = True):
     return degree
 
 
-def edges_from_adjacency_list(adjacency, seperator1 = ' -> ', seperator2 = ','):
+def weighted_edges(strings):
+    edges = []
+
+    for string in strings:
+        splits = re.split('->|:', string)
+        edges.append((splits[0], splits[1], int(splits[2])))
+
+    return edges
+
+
+def weighted_edges_table(strings):
+    edges = defaultdict(int)
+
+    for string in strings:
+        splits = re.split('->|:', string)
+        edges[(splits[0], splits[1])] = int(splits[2])
+
+    return edges
+
+
+def edges_from_adjacency_list(adjacency):
     edges = []
 
     for line in adjacency:
-        edge = line.split(seperator1)
-        for head in edge[1].split(seperator2):
-            edges.append((edge[0], head))
+        splits = re.split(' -> |,', line)
+        for head in splits[1:]:
+            edges.append((splits[0], head))
 
     return edges
 
@@ -654,22 +675,54 @@ def semi_connected(nodes, edges):
 
 
 def shortest_path(s, nodes, edges):
-    distances = {}
-    nodes     = topological_sort(nodes, edges)
+    dists = {}
+    pres  = {}
+    nodes = topological_sort(nodes, edges)
 
     for node in nodes:
-        distances[node] = float('inf')
+        dists[node] = float('inf')
 
-    distances[s] = 0
+    dists[s] = 0
 
     for node in nodes:
         for u, v, w in edges:
             if node == u:
-                if distances[v] > distances[u] + w:
-                    distances[v] = distances[u] + w
+                if dists[v] > dists[u] + w:
+                    dists[v] = dists[u] + w
+                    pres[v]  = u
 
-    return distances
+    return dists, pres
 
+
+def longest_path(source, nodes, edges):
+    dists = {}
+    pres  = {}
+    nodes = topological_sort(nodes, edges)
+
+    for node in nodes:
+        dists[node] = -float('inf')
+
+    dists[source] = 0
+
+    for node in nodes:
+        for u, v, w in edges:
+            if node == u:
+                if dists[v] < dists[u] + w:
+                    dists[v] = dists[u] + w
+                    pres[v]  = u
+
+    return dists, pres
+
+
+def construct_path_from_predecessors(start, end, predecessor):
+    path    = [end]
+    current = end
+
+    while current != start:
+        current = predecessor[current]
+        path.insert(0, current)
+
+    return path
 
 
 def floyd_warshall(nodes, edges):
