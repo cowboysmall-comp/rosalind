@@ -327,6 +327,52 @@ def affine_gap_alignment(s, t, scoring, sigma = -11, epsilon = -1):
     return e_d, ''.join(s_a), ''.join(t_a)
 
 
+def middle_column(s, t, mid, scoring, gap = -5):
+    m   = len(s)
+    n   = len(t)
+
+    T   = [[0] * 2 for _ in xrange(m + 1)]
+    B   = [0] * (m + 1)
+
+    for i in xrange(1, m + 1):
+        T[i][0] = gap * i
+
+    for j in xrange(1, mid + 1):
+        T[0][1] = gap * j
+        for i in xrange(1, m + 1):
+            T[i][1] = max(T[i - 1][0] + scoring[s[i - 1]][t[j - 1]], T[i - 1][1] + gap, T[i][0] + gap)
+
+            if T[i][1] == T[i - 1][0] + scoring[s[i - 1]][t[j - 1]]:
+                B[i] = (1, 1)
+            elif T[i][1] == T[i - 1][1] + gap:
+                B[i] = (1, 0)
+            elif T[i][1] == T[i][0] + gap:
+                B[i] = (0, 1)
+
+        if j < mid:
+            for i in xrange(0, m + 1):
+                T[i][0] = T[i][1]
+
+    return [t[1] for t in T], B
+
+
+def middle_node(s, t, scoring, gap = -5):
+    mid = len(t) // 2
+    c   = middle_column(s, t, mid, scoring, gap)[0]
+    row = c.index(max(c))
+
+    return row, mid
+
+
+def middle_edge(s, t, scoring, gap = -5):
+    mid  = (len(t) // 2) + 1
+    node = middle_node(s, t, scoring, gap)
+    b    = middle_column(s[::-1], t[::-1], mid, scoring, gap)[1][::-1]
+    off  = b[node[0]]
+
+    return node, (node[0] + off[0], node[1] + off[1])
+
+
 def failure_array(string):
     N = len(string)
     T = [0] * N
