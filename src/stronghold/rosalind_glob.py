@@ -3,12 +3,12 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import fasta
-import tables
+import table
 import strings
 
 
 def main(argv):
-    blosom62 = tables.scoring(argv[0])
+    blosom62 = table.scoring(argv[0])
     s, t     = fasta.read_ordered(argv[1])
     m, n     = len(s), len(t)
 

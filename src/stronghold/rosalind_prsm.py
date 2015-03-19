@@ -4,11 +4,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import genetics
 import multisets
-import tables
+import table
 
 
 def main(argv):
-    table = tables.mass(argv[0])
+    mass = table.mass(argv[0])
 
     with open(argv[1]) as file:
         n        = int(file.readline().strip())
@@ -18,7 +18,7 @@ def main(argv):
         M        = []
 
         for protein in proteins:
-            S       = genetics.complete_spectrum(protein, table)
+            S       = genetics.complete_spectrum(protein, mass)
             mult    = multisets.multiplicity(multisets.minkowski_difference(R, S))
             maximum = max(mult, key = mult.get)
             M.append((mult[maximum], protein))

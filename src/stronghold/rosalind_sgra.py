@@ -4,13 +4,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import genetics
-import tables
+import table
 
 
 def main(argv):
-    table = tables.reverse_mass(argv[0])
-    nodes = sorted(files.read_floats(argv[1]))
-    edges = genetics.spectrum_graph(nodes, table)
+    rev_mass = table.reverse_mass(argv[0])
+    nodes    = sorted(files.read_floats(argv[1]))
+    edges    = genetics.spectrum_graph(nodes, rev_mass)
 
     print genetics.longest_protein(nodes, edges)
 

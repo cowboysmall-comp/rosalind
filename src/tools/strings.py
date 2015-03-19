@@ -332,7 +332,7 @@ def middle_column(s, t, mid, scoring, gap = -5):
     n   = len(t)
 
     T   = [[0] * 2 for _ in xrange(m + 1)]
-    B   = [0] * (m + 1)
+    B   = [(0, 0)] * (m + 1)
 
     for i in xrange(1, m + 1):
         T[i][0] = gap * i

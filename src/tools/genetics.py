@@ -535,7 +535,7 @@ def matching_peptides(masses, spectrum, table):
                     candidates.remove(candidate)
             else:
                 candidates.remove(candidate)
-        candidates = [c + w for c in candidates for mass in masses]
+        candidates = [c + m for c in candidates for m in masses]
 
     return matches
 

@@ -3,15 +3,15 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import tables
+import table
 import genetics
 
 
 def main(argv):
-    table = tables.codon(argv[0])
+    codon = table.codon(argv[0])
     rna   = files.read_line(argv[1])
 
-    print genetics.encode_protein(rna, table)
+    print genetics.encode_protein(rna, codon)
 
 
 if __name__ == "__main__":

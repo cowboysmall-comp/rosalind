@@ -3,15 +3,15 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import tables
+import table
 import genetics
 
 
 def main(argv):
-    table  = tables.reverse_codon(argv[0])
-    string = files.read_line(argv[1])
+    rev_codon = table.reverse_codon(argv[0])
+    string    = files.read_line(argv[1])
 
-    print genetics.count_rnas_from_protein(string, table)
+    print genetics.count_rnas_from_protein(string, rev_codon)
 
 
 if __name__ == "__main__":

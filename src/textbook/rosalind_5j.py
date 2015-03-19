@@ -4,11 +4,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import strings
-import tables
+import table
 
 
 def main(argv):
-    blosom62 = tables.scoring(argv[0])
+    blosom62 = table.scoring(argv[0])
     lines    = files.read_lines(argv[1])
     result   = strings.affine_gap_alignment(lines[0], lines[1], blosom62)
 

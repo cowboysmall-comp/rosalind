@@ -4,12 +4,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import fasta
 import genetics
-import tables
+import table
 import re
 
 
 def main(argv):
-    table   = tables.codon(argv[0])
+    codon   = table.codon(argv[0])
     dna     = fasta.read_one(argv[1])
 
     rna1    = genetics.dna_to_rna(dna)
@@ -17,8 +17,8 @@ def main(argv):
 
     encoded = set()
 
-    encoded.update(genetics.encode_protein_from_orf(rna1, table))
-    encoded.update(genetics.encode_protein_from_orf(rna2, table))
+    encoded.update(genetics.encode_protein_from_orf(rna1, codon))
+    encoded.update(genetics.encode_protein_from_orf(rna2, codon))
 
     print '\n'.join(list(encoded))
 
