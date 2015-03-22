@@ -8,9 +8,9 @@ import files
 
 
 def main(argv):
-    call('meme %s -text -nostatus -protein -minw 20 > out.txt' % argv[0], shell = True)
+    call('meme %s -text -nostatus -protein -minw 20 > meme_out.txt' % argv[0], shell = True)
 
-    with open('out.txt') as file:
+    with open('meme_out.txt') as file:
         while True:
             line = file.readline()
             if 'Motif 1 regular expression' in line:
@@ -18,7 +18,7 @@ def main(argv):
                 print file.readline().strip()
                 break
 
-    os.remove('out.txt')
+    os.remove('meme_out.txt')
 
 
 if __name__ == "__main__":
