@@ -191,6 +191,24 @@ def insertion_sort(A):
     return swaps, A
 
 
+def greedy_reversal_sort(perm):
+    distance = 0
+    perms    = []
+
+    for k in xrange(len(perm)):
+        if abs(perm[k]) != k + 1:
+            l         = perm.index(k + 1) if (k + 1) in perm else perm.index(-(k + 1))
+            perm      = perm[:k] + [-p for p in perm[k:l + 1][::-1]] + perm[l + 1:]
+            distance += 1
+            perms.append(perm)
+        if perm[k] == -(k + 1):
+            perm      = perm[:k] + [-perm[k]] + perm[k + 1:]
+            distance += 1
+            perms.append(perm)
+
+    return distance, perms
+
+
 def count_breaks(perm):
     perm  = [min(perm) - 1] + perm + [max(perm) + 1]
     count = 0

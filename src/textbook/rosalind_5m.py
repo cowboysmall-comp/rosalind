@@ -8,11 +8,11 @@ import table
 
 
 def main(argv):
-    blosom62 = table.scoring(argv[0])
-    s, t     = files.read_lines(argv[1])
-    edge     = strings.middle_edge(s, t, blosom62)
+    lines    = files.read_lines(argv[0])
+    result   = strings.multiple_alignment(lines[0], lines[1], lines[2])
 
-    print edge[0], edge[1]
+    print result[0]
+    print '\n'.join(result[1:])
 
 
 if __name__ == "__main__":

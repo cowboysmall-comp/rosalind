@@ -108,7 +108,7 @@ def optimal_alignment(s, t, scoring, gap = -5):
     s_a = []
     t_a = []
 
-    while m + n > 0:
+    while m > 0 and n > 0:
         if T[m][n] == T[m - 1][n] + gap:
             s_a.insert(0, s[m - 1])
             t_a.insert(0, '-')
@@ -122,6 +122,16 @@ def optimal_alignment(s, t, scoring, gap = -5):
             t_a.insert(0, t[n - 1])
             m -= 1
             n -= 1
+
+    while m > 0:
+        s_a.insert(0, s[m - 1])
+        t_a.insert(0, '-')
+        m -= 1
+
+    while n > 0:
+        s_a.insert(0, '-')
+        t_a.insert(0, t[n - 1])
+        n -= 1
 
     return e_d, ''.join(s_a), ''.join(t_a)
 
@@ -365,12 +375,150 @@ def middle_node(s, t, scoring, gap = -5):
 
 
 def middle_edge(s, t, scoring, gap = -5):
-    mid  = (len(t) // 2) + 1
-    node = middle_node(s, t, scoring, gap)
-    b    = middle_column(s[::-1], t[::-1], mid, scoring, gap)[1][::-1]
-    off  = b[node[0]]
+    mid  = len(t) // 2
 
-    return node, (node[0] + off[0], node[1] + off[1])
+    c    = middle_column(s, t, mid, scoring, gap)[0]
+    n, b = middle_column(s[::-1], t[::-1], len(t) - mid, scoring, gap)
+
+    n    = n[::-1]
+    b    = b[::-1]
+
+    s    = [c[i] + n[i] for i in xrange(len(c))]
+    row  = s.index(max(s))
+
+    off  = b[row]
+
+    return (row, mid), (row + off[0], mid + off[1])
+
+
+def calculate_score(s, t, scoring, gap = -5):
+    score = 0
+
+    for a in zip(s, t):
+        if '-' in a:
+            score += gap
+        else:
+            score += scoring[a[0]][a[1]]
+
+    return score
+
+
+def linear_space_alignment(s, t, scoring, gap = -5):
+
+    def alignment(top, bottom, left, right):
+        if right - left == 0:
+            return (s[top:bottom], '-' * (bottom - top))
+
+        if bottom - top == 0:
+            return ('-' * (right - left), t[left:right])
+
+        if right - left == 1 or bottom - top == 1:
+            return optimal_alignment(s[top:bottom], t[left:right], scoring, gap)[1:]
+
+        m, n   = middle_edge(s[top:bottom], t[left:right], scoring, gap)
+
+        start  = alignment(top, m[0] + top, left, m[1] + left)
+        middle = alignment(m[0] + top, n[0] + top, m[1] + left, n[1] + left)
+        end    = alignment(n[0] + top, bottom, n[1] + left, right)
+
+        return [start[i] + middle[i] + end[i] for i in xrange(2)]
+
+    s, t  = alignment(0, len(s), 0, len(t))
+    score = calculate_score(s, t, scoring, gap)
+    return score, s, t
+
+
+def multiple_alignment_table(s, t, u):
+    m = len(s)
+    n = len(t)
+    o = len(u)
+
+    T = [[[0 for _ in xrange(o + 1)] for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            for k in xrange(1, o + 1):
+                T[i][j][k] = max(T[i - 1][j - 1][k - 1] + 1 if (s[i - 1] == t[j - 1] == u[k - 1]) else 0, T[i - 1][j][k], T[i][j - 1][k], T[i][j][k - 1], T[i - 1][j - 1][k], T[i - 1][j][k - 1], T[i][j - 1][k - 1])
+
+    return T
+
+
+def multiple_alignment(s, t, u):
+    m   = len(s)
+    n   = len(t)
+    o   = len(u)
+
+    T   = multiple_alignment_table(s, t, u)
+    e_d = T[m][n][o]
+
+    s_a = []
+    t_a = []
+    u_a = []
+
+    while m > 0 and n > 0 and o > 0:
+        if T[m][n][o] == T[m - 1][n - 1][o - 1] + 1 if (s[m - 1] == t[n - 1] == u[o - 1]) else 0:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            m -= 1
+            n -= 1
+            o -= 1
+        elif T[m][n][o] == T[m - 1][n][o]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            m -= 1
+        elif T[m][n][o] == T[m][n - 1][o]:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            n -= 1
+        elif T[m][n][o] == T[m][n][o - 1]:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            o -= 1
+        elif T[m][n][o] == T[m - 1][n - 1][o]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            m -= 1
+            n -= 1
+        elif T[m][n][o] == T[m - 1][n][o - 1]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            m -= 1
+            o -= 1
+        elif T[m][n][o] == T[m][n - 1][o - 1]:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            n -= 1
+            o -= 1
+
+    while m > 0:
+        s_a.insert(0, s[m - 1])
+        m -= 1
+
+    while n > 0:
+        t_a.insert(0, t[n - 1])
+        n -= 1
+
+    while o > 0:
+        u_a.insert(0, u[o - 1])
+        o -= 1
+
+    while len(s_a) < max(len(s_a), len(t_a), len(u_a)):
+        s_a.insert(0, '-')
+
+    while len(t_a) < max(len(s_a), len(t_a), len(u_a)):
+        t_a.insert(0, '-')
+
+    while len(u_a) < max(len(s_a), len(t_a), len(u_a)):
+        u_a.insert(0, '-')
+
+    return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a)
 
 
 def failure_array(string):
