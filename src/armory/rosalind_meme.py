@@ -7,18 +7,26 @@ from subprocess import call
 import files
 
 
-def main(argv):
-    call('meme %s -text -nostatus -protein -minw 20 > meme_out.txt' % argv[0], shell = True)
+def best_scoring_motif(file_path):
+    motif = None
+
+    call('meme %s -text -protein -minw 20 -nostatus > meme_out.txt' % file_path, shell = True)
 
     with open('meme_out.txt') as file:
-        while True:
+        while not motif:
             line = file.readline()
-            if 'Motif 1 regular expression' in line:
+            if 'regular expression' in line:
                 file.readline()
-                print file.readline().strip()
-                break
+                motif = file.readline().strip()
 
     os.remove('meme_out.txt')
+
+    return motif
+
+
+def main(argv):
+    print best_scoring_motif(argv[0])
+
 
 
 if __name__ == "__main__":
