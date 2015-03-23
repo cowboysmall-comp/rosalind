@@ -9,11 +9,11 @@ import files
 
 
 def main(argv):
-    ids          = files.read_line(argv[0]).split(' ')
+    ids          = files.read_line_of_words(argv[0])
 
     Entrez.email = "jerry@cowboysmall.com"
 
-    handle       = Entrez.efetch(db = 'nucleotide', id = [', '.join(ids)], rettype = 'fasta')
+    handle       = Entrez.efetch(db = 'nucleotide', id = ids, rettype = 'fasta')
     records      = SeqIO.parse(handle, 'fasta')
     shortest     = min(records, key = len)
 

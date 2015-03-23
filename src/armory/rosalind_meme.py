@@ -4,8 +4,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 from subprocess import call
 
-import files
-
 
 def best_scoring_motif(file_path):
     motif = None
@@ -26,7 +24,6 @@ def best_scoring_motif(file_path):
 
 def main(argv):
     print best_scoring_motif(argv[0])
-
 
 
 if __name__ == "__main__":
