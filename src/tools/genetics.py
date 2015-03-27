@@ -183,6 +183,22 @@ def kmer_clump(dna, k, L, t):
     return kmers
 
 
+def shared_kmers(s1, s2, k):
+    kmers  = set()
+    lookup = defaultdict(list)
+
+    for i in xrange(len(s1) - k + 1):
+        kmer = s1[i:i + k]
+        lookup[kmer].append(i)
+
+    for i in xrange(len(s2) - k + 1):
+        kmer = s2[i:i + k]
+        for j in lookup[kmer] + lookup[dna_complement(kmer)]:
+            kmers.add((j, i))
+
+    return sorted(kmers)
+
+
 def kmer_reverse_frequency_table(table):
     freq = defaultdict(list)
 

@@ -2,10 +2,10 @@
 
 class Node:
 
-    def __init__(self, label, children = None):
+    def __init__(self, label, parent = None, children = None):
         self.label    = label
         self.data     = None
-        self.parent   = None
+        self.parent   = parent
         self.children = children if children else []
 
 
@@ -39,7 +39,7 @@ class Node:
 
 
     def __str__(self):
-        return '%s (%s)' % (self.data, self.depth())
+        return '%s (%s)' % (self.label, self.depth())
 
 
     def __repr__(self):
@@ -68,8 +68,9 @@ class SuffixTree:
         length = min(len(parent.label), len(node.label))
         for i in xrange(length):
             if parent.label[i] != node.label[i]:
+                node.parent     = parent
                 node.label      = node.label[i:]
-                parent.children = [Node(parent.label[i:], parent.children), node]
+                parent.children = [Node(parent.label[i:], parent, parent.children), node]
                 parent.label    = parent.label[:i]
                 return True
         return False
@@ -81,6 +82,7 @@ class SuffixTree:
         def traverse_from(node):
             if node.label:
                 traversal.append(node.label)
+
             for child in node.children:
                 traverse_from(child)
 
@@ -88,6 +90,46 @@ class SuffixTree:
 
         return traversal
 
+
+    def longest_repeat(self):
+        repeats = []
+
+        def to_string(node):
+            string = ''
+
+            while node:
+                string = node.label + string
+                node   = node.parent
+
+            return string
+
+        def traverse_from(node):
+            if node.label and node.child_count() > 1:
+                repeats.append(to_string(node))
+
+            for child in node.children:
+                traverse_from(child)
+
+        traverse_from(self.root)
+
+        return max(repeats, key = len)
+
+
+    def __str__(self):
+        string = []
+
+        def traverse_for_printing(node, space):
+            if node.label:
+                string.append(space + node.label)
+            else:
+                string.append('root')
+
+            for child in node.children:
+                traverse_for_printing(child, space + '  ')
+
+        traverse_for_printing(self.root, '  ')
+
+        return '\n'.join(string)
 
 
 def build_suffix_tree(string, edges):

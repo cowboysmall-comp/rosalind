@@ -1,5 +1,6 @@
 import permutations
 import arrays
+import graphs
 
 
 '''
@@ -209,8 +210,135 @@ def greedy_reversal_sort(perm):
     return distance, perms
 
 
+def breakpoints(perm):
+    perm  = [0] + perm + [len(perm) + 1]
+    count = 0
+
+    for i in xrange(len(perm) - 1):
+        if perm[i + 1] - perm[i] != 1:
+            count += 1
+
+    return count
+
+
+def chromosome_to_cycle(chromosome):
+    nodes = [None] * (2 * len(chromosome))
+
+    for j in xrange(1, len(chromosome) + 1):
+        i = chromosome[j - 1]
+        if i > 0:
+            nodes[(2 * j) - 2] =  (2 * i) - 1
+            nodes[(2 * j) - 1] =  (2 * i)
+        else:
+            nodes[(2 * j) - 2] = -(2 * i)
+            nodes[(2 * j) - 1] = -(2 * i) - 1
+
+    return nodes
+
+
+def cycle_to_chromosome(nodes):
+    chromosome = [None] * (len(nodes) // 2)
+
+    for j in xrange(1, (len(nodes) // 2) + 1):
+        if nodes[(2 * j) - 2] < nodes[(2 * j) - 1]:
+            chromosome[j - 1] = nodes[(2 * j) - 1] / 2
+        else:
+            chromosome[j - 1] = -nodes[(2 * j) - 2] / 2
+
+    return chromosome
+
+
+def colored_edges(genome):
+    edges = []
+
+    for chromosome in genome:
+        nodes  = chromosome_to_cycle(chromosome)
+        length = len(nodes)
+        for j in xrange(1, len(chromosome) + 1):
+            edges.append((nodes[((2 * j) - 1) % length], nodes[(2 * j) % length]))
+
+    return edges
+
+
+def black_edges(length):
+    return [((2 * i) - 1, 2 * i) for i in xrange(1, length + 1)]
+
+
+def get_cycles(edges):
+    cycles = []
+    cycle  = []
+
+    for pair in zip(black_edges(len(edges)), edges):
+        if pair[0][0] in pair[1]:
+            if pair[0][1] not in cycle:
+                cycle.append(pair[0][1])
+            cycle.append(pair[0][0])
+        else:
+            if pair[0][0] not in cycle:
+                cycle.append(pair[0][0])
+            cycle.append(pair[0][1])
+
+        if pair[1][1] in cycle:
+            cycles.append(cycle)
+            cycle = []
+        else:
+            cycle.append(pair[1][1])
+
+    return cycles
+
+
+def graph_to_genome(edges):
+    chromosomes = []
+
+    for cycle in get_cycles(edges):
+        chromosomes.append(cycle_to_chromosome(cycle))
+
+    return chromosomes
+
+
+'''
+    a version that doesn't use cycle_to_chromosome
+
+    def graph_to_genome(edges):
+        chromosomes = []
+        chromosome  = []
+        seen        = set()
+
+        for i, pair in enumerate(zip(black_edges(len(edges)), edges)):
+            if pair[0][1] in pair[1]:
+                chromosome.append(i + 1)
+            else:
+                chromosome.append(-(i + 1))
+
+            if pair[1][1] in seen:
+                chromosomes.append(chromosome)
+                chromosome = []
+            else:
+                seen.add(pair[0][0])
+                seen.add(pair[0][1])
+
+        return chromosomes
+
+'''
+
+def two_break_distance(P, Q):
+    edges      = set()
+    for genome in [P, Q]:
+        for edge in colored_edges(genome):
+            edges.add(edge)
+
+    adjacency  = graphs.adjacency_table(edges, directed = False)
+    components = graphs.connected_components_iterative(adjacency)
+
+    return sum(len(g) for g in P) - len(components)
+
+
+
+
+
+
 def count_breaks(perm):
-    perm  = [min(perm) - 1] + perm + [max(perm) + 1]
+    perm  = [0] + perm + [len(perm) + 1]
     count = 0
 
     for i in xrange(len(perm) - 1):
@@ -220,12 +348,9 @@ def count_breaks(perm):
     return count
 
 
-def get_breaks(perms):
-    return [count_breaks(perm[1]) for perm in perms]
-
-
-def prune_perms(perms, breaks):
+def prune_perms(perms):
     pruned = []
+    breaks = [count_breaks(perm[1]) for perm in perms]
 
     if breaks:
         minimum = min(breaks)
@@ -238,26 +363,24 @@ def prune_perms(perms, breaks):
 
 
 def generate_reversals(perm):
-    revs = perm[0]
-    perm = perm[1]
-    for j in xrange(len(perm) - 1, 1, -1):
+    for j in xrange(len(perm[1]) - 1, 1, -1):
         for i in xrange(j):
-            yield (revs + [(i + 1, j + 1)], perm[:i] + perm[i:j + 1][::-1] + perm[j + 1:])
+            yield perm[0] + [(i + 1, j + 1)], perm[1][:i] + perm[1][i:j + 1][::-1] + perm[1][j + 1:]
 
 
 def reversal_sort(perm):
-    visited  = set()
+    visited = set()
     visited.add(tuple(perm))
 
-    queue    = []
+    queue   = []
     queue.append(([], perm))
 
-    count    = 0
+    count   = 0
 
     while permutations.IDENTITY not in visited:
         count += 1
 
-        temp = []
+        temp   = []
         for perm in queue:
             for reversal in generate_reversals(perm):
                 rev = tuple(reversal[1])
@@ -269,8 +392,7 @@ def reversal_sort(perm):
                     visited.add(rev)
                     temp.append(reversal)
 
-        breaks = get_breaks(temp)
-        queue  = prune_perms(temp, breaks)
+        queue  = prune_perms(temp)
 
     return count, []
 

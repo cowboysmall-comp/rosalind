@@ -7,6 +7,36 @@ class Trie:
         self._root  = {'': {}}
 
 
+    def prefix_matching(self, text):
+        current = self._root['']
+        index   = 0
+        symbol  = text[index]
+
+        while True:
+            if not current:
+                return text[:index]
+            elif symbol in current:
+                current = current[symbol]
+                index  += 1
+                if index < len(text):
+                    symbol = text[index]
+            else:
+                return None
+
+
+    def matching(self, text):
+        matches = []
+        index   = 0
+
+        while index < len(text):
+            match = self.prefix_matching(text[index:])
+            if match:
+                matches.append((index, match))
+            index += 1
+
+        return matches
+
+
     def insert(self, string):
         node  = self._root['']
         index = 0
@@ -25,7 +55,7 @@ class Trie:
             index += 1
 
 
-    def edges(self):
+    def edges(self, label = 0):
         labeled = []
 
         def edges_traversal(current, label):
@@ -37,7 +67,7 @@ class Trie:
 
             return current_label
 
-        edges_traversal(self._root[''], 1)
+        edges_traversal(self._root[''], label)
 
         return labeled
 

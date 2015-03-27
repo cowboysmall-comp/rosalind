@@ -7,12 +7,15 @@ import trie
 
 
 def main(argv):
-    tries = trie.Trie()
+    lines = files.read_lines(argv[0])
 
-    for line in files.read_lines(argv[0]):
+    tries = trie.Trie()
+    for line in lines[1:]:
         tries.insert(line)
 
-    print '\n'.join('%s %s %s' % trie for trie in tries.edges(label = 1))
+    matches = tries.matching(lines[0])
+
+    print ' '.join(str(match[0]) for match in matches)
 
 
 if __name__ == "__main__":

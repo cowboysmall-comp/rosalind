@@ -258,6 +258,30 @@ def connected_components(nodes, edges, directed = True):
     return components
 
 
+def connected_components_iterative(adjacency):
+    explored   = set()
+
+    components = []
+    component  = set()
+
+    for node in adjacency.keys():
+        if node not in explored:
+            queue  = deque([node])
+
+            while queue:
+                v = queue.popleft()
+                explored.add(v)
+                queue.extend(set(adjacency[v]) - explored)
+                component |= set(adjacency[v])
+
+            if component:
+                components.append(component)
+
+            component = set()
+
+    return components
+
+
 def bipartite(s, nodes, edges, directed = True):
     C = {}
 

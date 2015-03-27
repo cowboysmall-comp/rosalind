@@ -82,3 +82,26 @@ def count_inversions(A):
 
     return c
 
+
+def suffix_array(string):
+    suffix_array = []
+
+    for i in xrange(len(string)):
+        suffix_array.append((i, string[i:]))
+
+    return sorted(suffix_array, key = lambda x: x[1])
+
+
+def lcp_array(suffix_array):
+    lcp_array = [(0, -1)]
+
+    for i in xrange(1, len(suffix_array)):
+        string1 = suffix_array[i - 1][1]
+        string2 = suffix_array[i][1]
+        for j in xrange(min(len(string1), len(string2))):
+            if string1[j] != string2[j]:
+                lcp_array.append((i, j))
+                break
+
+    return lcp_array
+

@@ -12,7 +12,7 @@ def main(argv):
     for line in files.read_lines(argv[0]):
         tries.insert(line)
 
-    print '\n'.join('%s %s %s' % trie for trie in tries.edges(label = 1))
+    print '\n'.join('%s->%s:%s' % trie for trie in tries.edges())
 
 
 if __name__ == "__main__":
