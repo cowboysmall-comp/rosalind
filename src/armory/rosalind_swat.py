@@ -30,8 +30,10 @@ def pairwise_local_alignment(id1, id2):
 def write_to_file(identifier):
     handle = ExPASy.get_sprot_raw(identifier)
     record = SeqIO.read(handle, 'swiss')
+
     with open('%s.txt' % identifier, 'w') as file:
         SeqIO.write(record, file, 'fasta')
+
     handle.close()
 
 
