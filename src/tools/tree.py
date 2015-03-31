@@ -21,6 +21,13 @@ class Node:
         return len(self.children) == 0
 
 
+    def has_leaf_children(self):
+        for child in self.children:
+            if child.is_leaf():
+                return True
+        return False
+
+
     def child_count(self):
         return len(self.children)
 
@@ -38,8 +45,17 @@ class Node:
         self.children.append(node)
 
 
+    def remove_child(self, node):
+        node.parent = None
+        self.children.remove(node)
+
+
+    def clear_children(self):
+        self.children = []
+
+
     def __str__(self):
-        return '%s (%s)' % (self.label, self.depth())
+        return '%s - depth:%s' % (self.label, self.depth())
 
 
     def __repr__(self):
@@ -47,32 +63,37 @@ class Node:
 
 
 
-class SuffixTree:
 
-    def __init__(self, string):
-        self.root = Node(string)
-        for i in xrange(1, len(string)):
-            self.add_child(self.root, Node(string[i:]))
-
+class BaseSuffixTree:
 
     def add_child(self, parent, node):
         if not self.split(parent, node):
             node.label = node.label[len(parent.label):]
+
             for child in parent.children:
                 if child.label[0] == node.label[0]:
                     return self.add_child(child, node)
+
             parent.add_child(node)
 
             
     def split(self, parent, node):
-        length = min(len(parent.label), len(node.label))
-        for i in xrange(length):
-            if parent.label[i] != node.label[i]:
-                node.parent     = parent
-                node.label      = node.label[i:]
-                parent.children = [Node(parent.label[i:], parent, parent.children), node]
+        for i in xrange(min(len(node.label), len(parent.label))):
+            if node.label[i] != parent.label[i]:
+                new_node1       = Node(parent.label[i:])
+                new_node2       = Node(node.label[i:])
+
+                for child in parent.children:
+                    new_node1.add_child(child)
+
                 parent.label    = parent.label[:i]
+                parent.children = []
+
+                parent.add_child(new_node1)
+                parent.add_child(new_node2)
+
                 return True
+
         return False
 
 
@@ -89,6 +110,32 @@ class SuffixTree:
         traverse_from(self.root)
 
         return traversal
+
+
+    def __str__(self):
+        string = []
+
+        def traverse_for_printing(node, space):
+            string.append(space + str(node))
+
+            for child in node.children:
+                traverse_for_printing(child, space + '  ')
+
+        traverse_for_printing(self.root, '  ')
+
+        return '\n'.join(string)
+
+
+
+
+class SuffixTree(BaseSuffixTree):
+
+    def __init__(self, string):
+        self.root = Node('')
+        if string[-1] != '$':
+            string += '$'
+        for i in xrange(len(string)):
+            self.add_child(self.root, Node(string[i:]))
 
 
     def longest_repeat(self):
@@ -115,21 +162,88 @@ class SuffixTree:
         return max(repeats, key = len)
 
 
-    def __str__(self):
-        string = []
 
-        def traverse_for_printing(node, space):
-            if node.label:
-                string.append(space + node.label)
-            else:
-                string.append('root')
 
-            for child in node.children:
-                traverse_for_printing(child, space + '  ')
+class GeneralizedSuffixTree(BaseSuffixTree):
 
-        traverse_for_printing(self.root, '  ')
+    def __init__(self, strings):
+        self.root = Node('')
+        for index, string in enumerate(strings):
+            string += '$%s' % index + 1
+            for i in xrange(len(string)):
+                self.add_child(self.root, Node(string[i:]))
 
-        return '\n'.join(string)
+
+
+def reconstruct_suffix_tree(word, sa, lcp):
+    nodes     = [Node('')]
+    traversal = []
+
+    def descent(node):
+        length = 0
+
+        while node:
+            length += len(node.label)
+            node    = node.parent
+
+        return length
+
+    def insert(index):
+        current = nodes[-1]
+        dist    = descent(current)
+
+        while dist > lcp[index + 1]:
+            current = current.parent
+            dist    = descent(current)
+
+        if dist == lcp[index + 1]:
+            start   = sa[index + 1] + lcp[index + 1]
+            node    = Node(word[start:])
+            current.add_child(node)
+            nodes.append(node)
+        else:
+            w       = current.children[-1]
+            distw   = descent(w)
+            current.remove_child(w)
+
+            start   = sa[index] + dist
+            end     = sa[index] + lcp[index + 1]
+            y       = Node(word[start:end])
+            current.add_child(y)
+            nodes.append(y)
+
+            start   = sa[index] + lcp[index + 1]
+            end     = sa[index] + distw
+            w.label = word[start:end]
+            y.add_child(w)
+
+            start   = sa[index + 1] + lcp[index + 1]
+            x       = Node(word[start:])
+            y.add_child(x)
+            nodes.append(x)
+
+    def traverse_from(node):
+        if node.label:
+            traversal.append(node.label)
+
+        for child in node.children:
+            traverse_from(child)
+
+    start = sa[0]
+    node  = Node(word[start:])
+    nodes[0].add_child(node)
+    nodes.append(node)
+
+    for index in xrange(len(sa) - 1):
+        insert(index)
+
+    traverse_from(nodes[0])
+
+    return traversal
+
+
+
+
 
 
 def build_suffix_tree(string, edges):
@@ -149,9 +263,25 @@ def build_suffix_tree(string, edges):
 
         start        = int(values[2]) - 1
         end          = int(values[3])
-        child.data   = string[start:start + end]
+        child.label  = string[start:start + end]
 
         parent.add_child(child)
 
     return nodes.values()[0].get_root()
+
+
+def longest_substring(node, k):
+    strings = []
+
+    for child in node.children:
+        string = child.label
+        if child.descendent_count() >= k:
+            substrings = longest_substring(child, k)
+            if substrings:
+                for substring in substrings:
+                    strings.append(string + substring)
+            else:
+                strings.append(string)
+
+    return sorted(strings)
 

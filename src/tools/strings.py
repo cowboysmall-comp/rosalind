@@ -739,22 +739,6 @@ def interwoven_matrix(string, strings):
     return M
 
 
-def longest_substring(node, k):
-    strings = []
-
-    for child in node.children:
-        string = child.data
-        if child.descendent_count() >= k:
-            substrings = longest_substring(child, k)
-            if substrings:
-                for substring in substrings:
-                    strings.append(string + substring)
-            else:
-                strings.append(string)
-
-    return sorted(strings)
-
-
 def find_indices_of_subsequence(s, t):
     indices = []
     index   = 0

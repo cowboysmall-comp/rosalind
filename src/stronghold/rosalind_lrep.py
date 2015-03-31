@@ -3,7 +3,6 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import strings
 import tree
 
 
@@ -16,7 +15,7 @@ def main(argv):
 
     root  = tree.build_suffix_tree(s, edges)
 
-    print max(strings.longest_substring(root, k), key = len)
+    print max(tree.longest_substring(root, k), key = len)
 
 
 if __name__ == "__main__":

@@ -8,11 +8,11 @@ import tree
 
 
 def main(argv):
-    # text  = files.read_line(argv[0])
-    # st    = tree.SuffixTree(text + '$')
-    # print st.longest_repeat()
-
     text  = files.read_line(argv[0])
+    st    = tree.SuffixTree(text)
+
+    print st.longest_repeat()
+
 
     sa    = arrays.suffix_array(text + '$')
     ha    = arrays.lcp_array(sa)

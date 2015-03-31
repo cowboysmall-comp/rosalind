@@ -4,16 +4,21 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import arrays
+import tree
 
 
 def shortest_non_shared_substring(s1, s2):
-    for i in xrange(len(s1)):
-        for j in xrange(len(s1)):
-            s = s1[j:j + i + 1]
-            if not s in s2:
-                return s
+    length   = len(s1)
+    shortest = []
 
-    return None
+    for i in xrange(1, length):
+        for j in xrange(length - i + 1):
+            s = s1[j:j + i]
+            if not s in s2 and not s in shortest:
+                shortest.append(s)
+        if shortest: break
+
+    return sorted(shortest)[0]
 
 
 def main(argv):
