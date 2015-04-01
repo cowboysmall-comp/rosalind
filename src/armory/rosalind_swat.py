@@ -23,6 +23,8 @@ def pairwise_local_alignment(id1, id2):
                 score = int(line.split(':')[1].strip().split('.')[0])
 
     os.remove('water_out.txt')
+    os.remove('%s.txt' % id1)
+    os.remove('%s.txt' % id2)
 
     return score
 

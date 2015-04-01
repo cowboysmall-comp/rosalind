@@ -80,17 +80,17 @@ class BaseSuffixTree:
     def split(self, parent, node):
         for i in xrange(min(len(node.label), len(parent.label))):
             if node.label[i] != parent.label[i]:
-                new_node1       = Node(parent.label[i:])
-                new_node2       = Node(node.label[i:])
+                new_node        = Node(parent.label[i:])
+                node.label      = node.label[i:]
 
                 for child in parent.children:
-                    new_node1.add_child(child)
+                    new_node.add_child(child)
 
                 parent.label    = parent.label[:i]
                 parent.children = []
 
-                parent.add_child(new_node1)
-                parent.add_child(new_node2)
+                parent.add_child(new_node)
+                parent.add_child(node)
 
                 return True
 
@@ -172,6 +172,7 @@ class GeneralizedSuffixTree(BaseSuffixTree):
             string += '$%s' % index + 1
             for i in xrange(len(string)):
                 self.add_child(self.root, Node(string[i:]))
+
 
 
 
@@ -268,6 +269,7 @@ def build_suffix_tree(string, edges):
         parent.add_child(child)
 
     return nodes.values()[0].get_root()
+
 
 
 def longest_substring(node, k):
