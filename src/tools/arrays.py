@@ -105,3 +105,13 @@ def lcp_array(suffix_array):
 
     return lcp_array
 
+
+def partial_suffix_array(string, k):
+    psa = []
+
+    for index, value in enumerate(suffix_array(string)):
+        if value[0] % k == 0:
+            psa.append((index, value[0]))
+
+    return psa
+
