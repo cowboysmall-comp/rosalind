@@ -9,3 +9,4 @@ def inverse(a):
 
 def composition(a, b):
     return [a[v - 1] for v in b]
+

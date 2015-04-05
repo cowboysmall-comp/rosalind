@@ -1,6 +1,7 @@
+import urllib2
+
 import fasta
 import files
-import urllib2
 
 
 def read_one(label):
@@ -14,3 +15,4 @@ def read(labels):
         data.append((label, read_one(label)))
 
     return data
+

@@ -83,25 +83,96 @@ def count_inversions(A):
     return c
 
 
+
+def indexed_text_array(text):
+    indexed = []
+    counter = defaultdict(int)
+
+    for c in text:
+        counter[c] += 1
+        indexed.append((c, counter[c]))
+
+    return indexed
+
+
+def last_to_first(first, last):
+    ltof  = {}
+
+    for index in xrange(len(last)):
+        ltof[index] = first.index(last[index])
+
+    return ltof
+
+
+def count_matrix(last):
+    row = {c: 0 for c in last}
+    c   = [row.copy()]
+
+    for l in last:
+        row[l] += 1
+        c.append(row.copy())
+
+    return c
+
+
+def checkpoint_matrix(last, k):
+    row = {c: 0 for c in last}
+    i   = 0
+    c   = {i:row.copy()}
+
+    for l in last:
+        i      += 1
+        row[l] += 1
+        if i % k == 0:
+            c[i] = row.copy()
+
+    return c
+
+
+def first_occurrence(first):
+    fo = {}
+
+    for f in first:
+        if f not in fo:
+            fo[f] = first.index(f)
+
+    return fo
+
+
+
+
+
+
+
 def suffix_array(string):
-    suffix_array = []
+    sa = []
 
     for i in xrange(len(string)):
-        suffix_array.append((i, string[i:]))
+        sa.append((i, string[i:]))
 
-    return sorted(suffix_array, key = lambda x: x[1])
+    return sorted(sa, key = lambda x: x[1])
+
+
+def partial_suffix_array(string, k):
+    psa = []
+
+    for index, value in enumerate(suffix_array(string)):
+        if value[0] % k == 0:
+            psa.append((index, value[0]))
+
+    return psa
 
 
 def lcp_array(suffix_array):
-    lcp_array = [(0, -1)]
+    lcp = [(0, -1)]
 
     for i in xrange(1, len(suffix_array)):
         string1 = suffix_array[i - 1][1]
         string2 = suffix_array[i][1]
         for j in xrange(min(len(string1), len(string2))):
             if string1[j] != string2[j]:
-                lcp_array.append((i, j))
+                lcp.append((i, j))
                 break
 
-    return lcp_array
+    return lcp
 

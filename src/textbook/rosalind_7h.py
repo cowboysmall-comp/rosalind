@@ -13,10 +13,6 @@ def main(argv):
     sa    = [int(v) for v in lines[1].split(', ')]
     lcp   = [int(v) for v in lines[2].split(', ')]
 
-    # text = 'banana$'
-    # sa   = [6, 5, 3, 1, 0, 4, 2]
-    # lcp  = [0, 0, 1, 3, 0, 0, 2]
-
     print '\n'.join(tree.reconstruct_suffix_tree(text, sa, lcp))
 
 

@@ -1,6 +1,9 @@
 from collections import defaultdict
 from itertools import combinations
 
+import arrays
+import distance
+
 
 MATCH    =  0
 MISMATCH = -1
@@ -141,7 +144,6 @@ def local_alignment_table(s, t, scoring, gap = -5):
     n       = len(t)
 
     table   = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
-
     maximum = (0, 0, 0)
 
     for i in xrange(1, m + 1):
@@ -270,35 +272,59 @@ def overlap_alignment(s, t):
     return e_d, ''.join(s_a), ''.join(t_a)
 
 
-def affine_gap_alignment_table(s, t, scoring, sigma = -11, epsilon = -1):
-    m       = len(s)
-    n       = len(t)
+def constant_gap_penalty_alignment_table(s, t, scoring, gap = -5):
+    m = len(s)
+    n = len(t)
 
-    table   = [[[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)] for _ in xrange(3)]
-
-    maximum = (0, 0, 0, 0)
+    T = [[[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)] for _ in xrange(3)]
 
     for i in xrange(1, m + 1):
-        table[0][i][0] = sigma + (i - 1) * epsilon
-        table[1][i][0] = sigma + (i - 1) * epsilon
-        table[2][i][0] = sigma + (i - 1) * epsilon
+        T[0][i][0] = gap
+        T[1][i][0] = gap
+        T[2][i][0] = gap
 
     for j in xrange(1, n + 1):
-        table[0][0][j] = sigma + (j - 1) * epsilon
-        table[1][0][j] = sigma + (j - 1) * epsilon
-        table[2][0][j] = sigma + (j - 1) * epsilon
+        T[0][0][j] = gap
+        T[1][0][j] = gap
+        T[2][0][j] = gap
 
     for i in xrange(1, m + 1):
         for j in xrange(1, n + 1):
-            table[0][i][j] = max(table[0][i - 1][j] + epsilon, table[1][i - 1][j] + sigma)
-            table[2][i][j] = max(table[2][i][j - 1] + epsilon, table[1][i][j - 1] + sigma)
-            table[1][i][j] = max(table[0][i][j], table[1][i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], table[2][i][j])
+            T[0][i][j] = max(T[0][i - 1][j], T[1][i - 1][j] + gap)
+            T[2][i][j] = max(T[2][i][j - 1], T[1][i][j - 1] + gap)
+            T[1][i][j] = max(T[0][i][j], T[1][i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], T[2][i][j])
+
+    return T
+
+
+def affine_gap_alignment_table(s, t, scoring, sigma = -11, epsilon = -1):
+    m = len(s)
+    n = len(t)
+
+    T = [[[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)] for _ in xrange(3)]
+    M = (0, 0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        T[0][i][0] = sigma + (i - 1) * epsilon
+        T[1][i][0] = sigma + (i - 1) * epsilon
+        T[2][i][0] = sigma + (i - 1) * epsilon
+
+    for j in xrange(1, n + 1):
+        T[0][0][j] = sigma + (j - 1) * epsilon
+        T[1][0][j] = sigma + (j - 1) * epsilon
+        T[2][0][j] = sigma + (j - 1) * epsilon
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            T[0][i][j] = max(T[0][i - 1][j] + epsilon, T[1][i - 1][j] + sigma)
+            T[2][i][j] = max(T[2][i][j - 1] + epsilon, T[1][i][j - 1] + sigma)
+            T[1][i][j] = max(T[0][i][j], T[1][i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], T[2][i][j])
 
     for i in xrange(3):
-        if maximum[0] < table[i][m][n]:
-            maximum = (table[i][m][n], i, m, n)
+        if M[0] < T[i][m][n]:
+            M = (T[i][m][n], i, m, n)
 
-    return table, maximum
+    return T, M
 
 
 def affine_gap_alignment(s, t, scoring, sigma = -11, epsilon = -1):
@@ -335,6 +361,64 @@ def affine_gap_alignment(s, t, scoring, sigma = -11, epsilon = -1):
                 n -= 1
 
     return e_d, ''.join(s_a), ''.join(t_a)
+
+
+
+def affine_gap_local_alignment_table(s, t, scoring, sigma = -11, epsilon = -1):
+    m       = len(s)
+    n       = len(t)
+
+    T = [[[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)] for _ in xrange(3)]
+    M = (0, 0, 0, 0)
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            T[0][i][j] = max(T[0][i - 1][j] + epsilon, T[1][i - 1][j] + sigma)
+            T[2][i][j] = max(T[2][i][j - 1] + epsilon, T[1][i][j - 1] + sigma)
+            T[1][i][j] = max(T[0][i][j], T[1][i - 1][j - 1] + scoring[s[i - 1]][t[j - 1]], T[2][i][j], 0)
+
+            if M[0] < T[1][i][j]:
+                M = (T[1][i][j], 1, i, j)
+
+    return T, M
+
+
+def affine_gap_local_alignment(s, t, scoring, sigma = -11, epsilon = -1):
+    T, M    = affine_gap_local_alignment_table(s, t, scoring, sigma, epsilon)
+
+    e_d     = M[0]
+    l, m, n = M[1:]
+
+    s_a     = []
+    t_a     = []
+
+    while T[l][m][n] > 0:
+
+        if l == 0:
+            if T[0][m][n] == T[1][m - 1][n] + sigma:
+                l = 1
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            m -= 1
+        elif l == 2:
+            if T[2][m][n] == T[1][m][n - 1] + sigma:
+                l = 1
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            n -= 1
+        else:
+            if T[1][m][n] == T[0][m][n]:
+                l = 0
+            elif T[1][m][n] == T[2][m][n]:
+                l = 2
+            else:
+                s_a.insert(0, s[m - 1])
+                t_a.insert(0, t[n - 1])
+                m -= 1
+                n -= 1
+
+    return e_d, ''.join(s_a), ''.join(t_a)
+
 
 
 def middle_column(s, t, mid, scoring, gap = -5):
@@ -438,7 +522,7 @@ def multiple_alignment_table(s, t, u):
     for i in xrange(1, m + 1):
         for j in xrange(1, n + 1):
             for k in xrange(1, o + 1):
-                T[i][j][k] = max(T[i - 1][j - 1][k - 1] + 1 if (s[i - 1] == t[j - 1] == u[k - 1]) else 0, T[i - 1][j][k], T[i][j - 1][k], T[i][j][k - 1], T[i - 1][j - 1][k], T[i - 1][j][k - 1], T[i][j - 1][k - 1])
+                T[i][j][k] = max(T[i - 1][j - 1][k - 1] + (1 if (s[i - 1] == t[j - 1] == u[k - 1]) else 0), T[i - 1][j][k], T[i][j - 1][k], T[i][j][k - 1], T[i - 1][j - 1][k], T[i - 1][j][k - 1], T[i][j - 1][k - 1])
 
     return T
 
@@ -456,7 +540,7 @@ def multiple_alignment(s, t, u):
     u_a = []
 
     while m > 0 and n > 0 and o > 0:
-        if T[m][n][o] == T[m - 1][n - 1][o - 1] + 1 if (s[m - 1] == t[n - 1] == u[o - 1]) else 0:
+        if T[m][n][o] == T[m - 1][n - 1][o - 1] + (1 if (s[m - 1] == t[n - 1] == u[o - 1]) else 0):
             s_a.insert(0, s[m - 1])
             t_a.insert(0, t[n - 1])
             u_a.insert(0, u[o - 1])
@@ -519,6 +603,213 @@ def multiple_alignment(s, t, u):
         u_a.insert(0, '-')
 
     return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a)
+
+
+
+
+
+
+def multiple_alignment_table4(s, t, u, v):
+    m = len(s)
+    n = len(t)
+    o = len(u)
+    p = len(v)
+
+    T = [[[[0 for _ in xrange(p + 1)] for _ in xrange(o + 1)] for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            for k in xrange(1, o + 1):
+                for l in xrange(1, p + 1):
+                    T[i][j][k][l] = max(
+                        T[i - 1][j - 1][k - 1][l - 1] + (1 if (s[i - 1] == t[j - 1] == u[k - 1] == v[l - 1]) else 0), 
+
+                        T[i - 1][j][k][l] - 1, 
+                        T[i][j - 1][k][l] - 1, 
+                        T[i][j][k - 1][l] - 1, 
+                        T[i][j][k][l - 1] - 1, 
+
+                        T[i - 1][j - 1][k][l] - 1, 
+                        T[i - 1][j][k - 1][l] - 1, 
+                        T[i - 1][j][k][l - 1] - 1,
+                        T[i][j - 1][k - 1][l] - 1, 
+                        T[i][j - 1][k][l - 1] - 1, 
+                        T[i][j][k - 1][l - 1] - 1, 
+
+                        T[i - 1][j - 1][k - 1][l] - 1,
+                        T[i - 1][j - 1][k][l - 1] - 1,
+                        T[i - 1][j][k - 1][l - 1] - 1,
+                        T[i][j - 1][k - 1][l - 1] - 1
+                    )
+
+    return T
+
+
+def multiple_alignment4(s, t, u, v):
+    m   = len(s)
+    n   = len(t)
+    o   = len(u)
+    p   = len(v)
+
+    T   = multiple_alignment_table4(s, t, u, v)
+    e_d = T[m][n][o][p]
+
+    s_a = []
+    t_a = []
+    u_a = []
+    v_a = []
+
+    while m > 0 and n > 0 and o > 0:
+        if T[m][n][o][p] == T[m - 1][n - 1][o - 1][p - 1] + (1 if (s[m - 1] == t[n - 1] == u[o - 1] == v[p - 1]) else 0):
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            n -= 1
+            o -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m - 1][n][o][p] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            m -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o][p] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            n -= 1
+        elif T[m][n][o][p] == T[m][n][o - 1][p] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            o -= 1
+        elif T[m][n][o][p] == T[m][n][o][p - 1] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m - 1][n - 1][o][p] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            m -= 1
+            n -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o - 1][p] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            m -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o][p - 1] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m][n - 1][o - 1][p] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            n -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o][p - 1] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            n -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m][n][o - 1][p - 1] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            o -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m - 1][n - 1][o - 1][p] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            m -= 1
+            n -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m - 1][n - 1][o][p - 1] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            n -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o - 1][p - 1] - 1:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            o -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o - 1][p - 1] - 1:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            n -= 1
+            o -= 1
+            p -= 1
+
+
+    while m > 0:
+        s_a.insert(0, s[m - 1])
+        m -= 1
+
+    while n > 0:
+        t_a.insert(0, t[n - 1])
+        n -= 1
+
+    while o > 0:
+        u_a.insert(0, u[o - 1])
+        o -= 1
+
+    while p > 0:
+        v_a.insert(0, v[p - 1])
+        p -= 1
+
+    while len(s_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        s_a.insert(0, '-')
+
+    while len(t_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        t_a.insert(0, '-')
+
+    while len(u_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        u_a.insert(0, '-')
+
+    while len(v_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        v_a.insert(0, '-')
+
+    return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a), ''.join(v_a)
+
+
+
+
 
 
 def failure_array(string):
@@ -762,4 +1053,162 @@ def find_indices_of_substrings(s, t):
         index += 1
 
     return indices
+
+
+
+
+
+def shortest_non_shared_substring(s1, s2):
+    length   = len(s1)
+    shortest = []
+
+    for i in xrange(1, length):
+        for j in xrange(length - i + 1):
+            s = s1[j:j + i]
+            if not s in s2 and not s in shortest:
+                shortest.append(s)
+        if shortest: break
+
+    return sorted(shortest)[0]
+
+
+
+
+
+def burrows_wheeler_transform(text):
+    matrix = []
+
+    for i in xrange(len(text)):
+        matrix.append(text[-i:] + text[:-i])
+
+    return ''.join(row[-1] for row in sorted(matrix))
+
+
+def inverse_burrows_wheeler_transform(text):
+    first = arrays.indexed_text_array(sorted(text))
+    last  = arrays.indexed_text_array(text)
+
+    row   = [first[0]]
+
+    while len(row) < len(first):
+        row.append(first[last.index(row[-1])])
+
+    return ''.join(r[0] for r in row[1:] + row[:1])
+
+
+
+
+def burrows_wheeler_matching(pattern, first, last, ltof):
+    top    = 0
+    bottom = len(last) - 1
+
+    while top <= bottom:
+        if pattern:
+            symbol   = pattern[-1]
+            pattern  = pattern[:-1]
+
+            itop     = top
+            ibottom  = bottom
+
+            if symbol in [s[0] for s in last[top:bottom + 1]]:
+
+                for i in xrange(top, bottom + 1):
+                    if last[i][0] == symbol:
+                        itop = i
+                        break
+
+                for i in xrange(bottom, top - 1, -1):
+                    if last[i][0] == symbol:
+                        ibottom = i
+                        break
+
+                top    = ltof[itop]
+                bottom = ltof[ibottom]
+            else:
+                return 0
+        else:
+            return bottom - top + 1
+
+
+def better_burrows_wheeler_matching(pattern, bwt, cm, fo):
+    top    = 0
+    bottom = len(bwt) - 1
+
+    while top <= bottom:
+        if pattern:
+            symbol   = pattern[-1]
+            pattern  = pattern[:-1]
+            if symbol in bwt[top:bottom + 1]:
+                top    = fo[symbol] + cm[top][symbol]
+                bottom = fo[symbol] + cm[bottom + 1][symbol] - 1
+            else:
+                return 0
+        else:
+            return bottom - top + 1
+
+
+def lighter_burrows_wheeler_matching(pattern, bwt, cm, fo, psa, first, last, k):
+    top    = 0
+    bottom = len(bwt) - 1
+
+    def count(num, char):
+        rem   = num % k
+        num   = num - rem
+        count = cm[num][char]
+
+        for i in xrange(num, num + rem):
+            if bwt[i] == char:
+                count += 1
+
+        return count
+
+    def find_index(index):
+        count   = 0
+        current = last[index]
+
+        while index not in psa:
+            index   = first.index(current)
+            current = last[index]
+            count  += 1
+
+        return psa[index] + count
+
+    while top <= bottom:
+        if pattern:
+            symbol  = pattern[-1]
+            pattern = pattern[:-1]
+            if symbol in bwt[top:bottom + 1]:
+                top    = fo[symbol] + count(top, symbol)
+                bottom = fo[symbol] + count(bottom + 1, symbol) - 1
+            else:
+                return []
+        else:
+            return [find_index(i) for i in xrange(top, bottom + 1)]
+
+
+def multiple_approximate_pattern_matching(d, pattern, text, bwt, cm, fo, psa, ifirst, ilast, k):
+    locations = []
+    length    = len(pattern)
+    offset    = length // (d + 1)
+
+    def starts():
+        starts = set()
+        count  = 0
+
+        while count < d + 1:
+            index  = count * offset
+            sub    = pattern[index:index + offset] if count < d else pattern[index:]
+
+            for match in lighter_burrows_wheeler_matching(sub, bwt, cm, fo, psa, ifirst, ilast, k):
+                starts.add(match - (count * offset))
+
+            count += 1
+
+        return starts
+
+    for start in starts():
+        if distance.hamming(text[start:start + length], pattern) <= d:
+            locations.append(start)
+
+    return locations
 

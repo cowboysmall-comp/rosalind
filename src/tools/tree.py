@@ -76,7 +76,7 @@ class BaseSuffixTree:
 
             parent.add_child(node)
 
-            
+
     def split(self, parent, node):
         for i in xrange(min(len(node.label), len(parent.label))):
             if node.label[i] != parent.label[i]:
@@ -138,7 +138,7 @@ class SuffixTree(BaseSuffixTree):
             self.add_child(self.root, Node(string[i:]))
 
 
-    def longest_repeat(self):
+    def repeats(self, length = 1):
         repeats = []
 
         def to_string(node):
@@ -152,14 +152,20 @@ class SuffixTree(BaseSuffixTree):
 
         def traverse_from(node):
             if node.label and node.child_count() > 1:
-                repeats.append(to_string(node))
+                string = to_string(node)
+                if len(string) >= length:
+                    repeats.append(string)
 
             for child in node.children:
                 traverse_from(child)
 
         traverse_from(self.root)
 
-        return max(repeats, key = len)
+        return repeats
+
+
+    def longest_repeat(self):
+        return max(self.repeats(), key = len)
 
 
 

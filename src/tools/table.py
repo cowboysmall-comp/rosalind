@@ -81,4 +81,4 @@ def scoring(file_path):
                 matrix[row][cols[i]] = int(value)
 
     return matrix
-            
+
