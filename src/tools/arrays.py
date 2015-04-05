@@ -145,6 +145,9 @@ def first_occurrence(first):
 
 
 def suffix_array(string):
+    if string[-1] != '$':
+        string += '$'
+
     sa = []
 
     for i in xrange(len(string)):

@@ -131,9 +131,10 @@ class BaseSuffixTree:
 class SuffixTree(BaseSuffixTree):
 
     def __init__(self, string):
-        self.root = Node('')
         if string[-1] != '$':
             string += '$'
+
+        self.root = Node('')
         for i in xrange(len(string)):
             self.add_child(self.root, Node(string[i:]))
 
