@@ -119,3 +119,4 @@ class WeightedQuickUnion:
 
     def get_sizes(self):
         return self.sizes
+

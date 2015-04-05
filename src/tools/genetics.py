@@ -8,6 +8,8 @@ from collections import defaultdict
 from itertools   import combinations, product
 
 import distance
+import graphs
+
 
 DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
@@ -59,14 +61,27 @@ def gc_contents(strings):
     return contents
 
 
-def list_kmers(string, k):
+def list_kmers(string, k, rc = False):
     length = len(string)
-    kmers  = []
+    kmers  = set()
 
     for i in xrange(length - k + 1):
-        kmers.append(string[i:i + k])
+        kmer = string[i:i + k]
+        kmers.add(kmer)
+        if rc:
+            kmers.add(dna_complement(kmer))
 
     return sorted(kmers)
+
+
+def kmer_candidates(strings, k, rc = False):
+    candidates = set()
+
+    for string in strings:
+        for kmer in list_kmers(string, k, rc):
+            candidates.add(kmer)
+
+    return candidates
 
 
 def paired_kmers(strings):
@@ -105,6 +120,21 @@ def reconstruct_strings_from_maximal_paths(maximal):
         strings.append(reconstruct_string_from_path(path))
 
     return sorted(strings)
+
+
+def assemble_genome_from_reads(reads):
+    length = len(reads[0])
+
+    for i in xrange(length - 1, 1, -1):
+        kmers = kmer_candidates(reads, i, rc = True)
+        edges = graphs.debruijn_graph(kmers)
+        adj   = graphs.adjacency_table(edges)
+
+        if len(graphs.connected_components_iterative(adj)) == 2:
+            path = graphs.eulerian_cycle(edges[0][1], edges)
+            return reconstruct_circular_string_from_path(path)
+
+    return None
 
 
 def kmer_occurences(string, pattern):
@@ -622,17 +652,6 @@ def convolution_frequent(counts, M):
         M += 1
 
     return [[item[1]] for item in ordered[:M]]
-
-
-def kmer_candidates(strings, k):
-    candidates = []
-
-    for string in strings:
-        length = len(string)
-        for i in xrange(length - k + 1):
-            candidates.append(string[i:i + k])
-
-    return candidates
 
 
 def sigma_distance(strings, kmer):

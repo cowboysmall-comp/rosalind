@@ -54,3 +54,4 @@ def read_one_from(obj):
             string += line
 
     return string
+

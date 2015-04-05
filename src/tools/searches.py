@@ -1,4 +1,3 @@
-from collections import defaultdict, deque
 
 
 def binary_search(array, key, start, end):
@@ -13,3 +12,4 @@ def binary_search(array, key, start, end):
             return binary_search(array, key, midpoint + 1, end)
         else:
             return midpoint
+

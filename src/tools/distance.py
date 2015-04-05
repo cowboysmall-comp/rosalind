@@ -57,3 +57,4 @@ def p_matrix(strings):
             D[j][i] = D[i][j]
 
     return D
+

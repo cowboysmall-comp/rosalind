@@ -28,3 +28,4 @@ def multiplicity(S):
         multip[str(s)] += 1
 
     return multip
+
