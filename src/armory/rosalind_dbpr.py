@@ -2,8 +2,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from Bio import ExPASy
-from Bio import SwissProt
+from Bio import ExPASy, SwissProt
 
 import files
 

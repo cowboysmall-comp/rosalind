@@ -3,7 +3,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 from subprocess import call
-from Bio        import SeqIO
+
+from Bio import SeqIO
 
 import files
 

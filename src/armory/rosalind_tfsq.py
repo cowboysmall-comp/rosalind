@@ -3,7 +3,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 from StringIO import StringIO
-from Bio      import SeqIO
+
+from Bio import SeqIO
 
 
 def main(argv):

@@ -2,8 +2,7 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from Bio import Entrez
-from Bio import SeqIO
+from Bio import Entrez, SeqIO
 
 import files
 

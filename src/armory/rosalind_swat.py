@@ -4,9 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 from subprocess import call
 
-from Bio import ExPASy
-from Bio import SwissProt
-from Bio import SeqIO
+from Bio import ExPASy, SwissProt, SeqIO
 
 import files
 
