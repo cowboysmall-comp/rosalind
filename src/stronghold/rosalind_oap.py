@@ -7,10 +7,8 @@ import strings
 
 
 def main(argv):
-    lines  = fasta.read_ordered(argv[0])
-    result = strings.overlap_alignment(lines[0], lines[1])
-
-    # unfinished - to be completed...
+    s, t   = fasta.read_ordered(argv[0])
+    result = strings.overlap_alignment(s, t)
 
     print result[0]
     print '\n'.join(result[1:])

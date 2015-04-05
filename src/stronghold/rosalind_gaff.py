@@ -9,8 +9,8 @@ import table
 
 def main(argv):
     blosom62 = table.scoring(argv[0])
-    lines    = fasta.read_ordered(argv[1])
-    result   = strings.affine_gap_alignment(lines[0], lines[1], blosom62)
+    s, t     = fasta.read_ordered(argv[1])
+    result   = strings.affine_gap_alignment(s, t, blosom62)
 
     print result[0]
     print '\n'.join(result[1:])

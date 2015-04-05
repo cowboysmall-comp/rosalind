@@ -7,9 +7,11 @@ import strings
 
 
 def main(argv):
-    s, t = fasta.read_ordered(argv[0])
+    s, t   = fasta.read_ordered(argv[0])
+    result = strings.optimal_basic_alignment(s, t)
 
-    print '%s\n%s\n%s' % strings.optimal_basic_alignment(s, t)
+    print result[0]
+    print '\n'.join(result[1:])
 
 
 if __name__ == "__main__":
