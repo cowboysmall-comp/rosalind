@@ -25,9 +25,9 @@ def main(argv):
 
 
     print
-    print 'suffix tree  - lc: %0.4f' % (sub1 / float(m))
+    print 'suffix tree  - lc: %0.4g' % (sub1 / float(m))
     print
-    print 'suffix array - lc: %0.4f' % (sub2 / float(m))
+    print 'suffix array - lc: %0.4g' % (sub2 / float(m))
     print
 
 
