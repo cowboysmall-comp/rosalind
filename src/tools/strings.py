@@ -843,7 +843,7 @@ def longest_subsequence(seq, increasing = True):
     return max(sub, key = len)
 
 
-def sequence_table(s, t):
+def longest_common_subsequence_table(s, t):
     m = len(s)
     n = len(t)
 
@@ -863,7 +863,7 @@ def longest_common_subsequence(s, t):
     m = len(s)
     n = len(t)
 
-    C = sequence_table(s, t)
+    C = longest_common_subsequence_table(s, t)
 
     sequence = []
 

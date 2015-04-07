@@ -137,6 +137,33 @@ def assemble_genome_from_reads(reads):
     return None
 
 
+def assemble_genome_from_reads_with_repeats(reads):
+    start   = reads[0]
+    edges   = graphs.debruijn_graph(reads[1:])
+
+    def list_cycles(start, edges):
+        if not edges:
+            return [[]]
+        else:
+            seen   = set()
+            cycles = []
+            for edge in filter(lambda x: x[0] == start, edges):
+                if edge[1] not in seen:
+                    seen.add(edge[1])
+                    index = edges.index(edge)
+                    for cycle in list_cycles(edge[1], edges[:index] + edges[index + 1:]):
+                        cycles.append([edge] + cycle)
+
+            return cycles
+
+    strings = set()
+
+    for cycle in list_cycles(start[1:], edges):
+        strings.add(start[0] + ''.join(c[0][0] for c in cycle))
+
+    return strings
+
+
 def kmer_occurences(string, pattern):
     return [i.start() for i in re.finditer(r'(?=(%s))' % pattern, string)]
 
