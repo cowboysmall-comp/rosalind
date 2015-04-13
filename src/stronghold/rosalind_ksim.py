@@ -10,7 +10,7 @@ def update_table(D, s, t, k):
     n = len(t)
 
     for i in xrange(1, m + 1):
-        for j in xrange(1, n + 1):
+        for j in xrange(max(1, i - k), min(n, i + k) + 1):
             D[i][j] = max(D[i - 1][j - 1] + (0 if s[i - 1] == t[j - 1] else -1), D[i - 1][j] - 1, D[i][j - 1] - 1)
 
 
@@ -18,10 +18,14 @@ def create_matrix(m, k):
     D = [[0 for _ in xrange(m + k + 1)] for _ in xrange(m + 1)]
 
     for i in xrange(1, m + 1):
-        D[i][0] = -i
+        for j in xrange(1, m + k + 1):
+            D[i][j] = -float('Inf')
+
+    for i in xrange(1, m + 1):
+        D[i][0] = D[i - 1][0] - 1
 
     for j in xrange(1, m + k + 1):
-        D[0][j] = -j
+        D[0][j] = D[0][j - 1] - 1
 
     return D
 
@@ -46,8 +50,6 @@ def main(argv):
     lines = files.read_lines(argv[0])
     k     = int(lines[0])
     s, t  = lines[1:]
-
-    # unfinished - to be completed...
 
     print '\n'.join('%s %s' % f for f in similar_motifs(s, t, k))
 
