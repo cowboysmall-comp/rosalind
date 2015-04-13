@@ -1,5 +1,7 @@
 **/.DS_STORE
 
+**/*.exe
+
 **/*.pyc
 **/*.py[cod]
 

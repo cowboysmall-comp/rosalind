@@ -209,19 +209,19 @@ def fitting_alignment(s, t):
     t_a  = []
 
     while m > 0 and n > 0:
-        if T[m][n] == T[m - 1][n] - 1:
+        if T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -1):
             s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
             m -= 1
+            n -= 1
         elif T[m][n] == T[m][n - 1] - 1:
             s_a.insert(0, '-')
             t_a.insert(0, t[n - 1])
             n -= 1
-        elif T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -1):
+        elif T[m][n] == T[m - 1][n] - 1:
             s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
+            t_a.insert(0, '-')
             m -= 1
-            n -= 1
 
     return e_d, ''.join(s_a), ''.join(t_a)
 
@@ -512,7 +512,12 @@ def linear_space_alignment(s, t, scoring, gap = -5):
     return score, s, t
 
 
-def multiple_alignment_table(s, t, u):
+
+
+
+
+
+def tripple_alignment_table(s, t, u):
     m = len(s)
     n = len(t)
     o = len(u)
@@ -522,17 +527,25 @@ def multiple_alignment_table(s, t, u):
     for i in xrange(1, m + 1):
         for j in xrange(1, n + 1):
             for k in xrange(1, o + 1):
-                T[i][j][k] = max(T[i - 1][j - 1][k - 1] + (1 if (s[i - 1] == t[j - 1] == u[k - 1]) else 0), T[i - 1][j][k], T[i][j - 1][k], T[i][j][k - 1], T[i - 1][j - 1][k], T[i - 1][j][k - 1], T[i][j - 1][k - 1])
+                T[i][j][k] = max(
+                    T[i - 1][j - 1][k - 1] + (1 if (s[i - 1] == t[j - 1] == u[k - 1]) else 0), 
+                    T[i - 1][j - 1][k], 
+                    T[i - 1][j][k - 1], 
+                    T[i][j - 1][k - 1], 
+                    T[i - 1][j][k], 
+                    T[i][j - 1][k], 
+                    T[i][j][k - 1]
+                )
 
     return T
 
 
-def multiple_alignment(s, t, u):
+def tripple_alignment(s, t, u):
     m   = len(s)
     n   = len(t)
     o   = len(u)
 
-    T   = multiple_alignment_table(s, t, u)
+    T   = tripple_alignment_table(s, t, u)
     e_d = T[m][n][o]
 
     s_a = []
@@ -547,21 +560,7 @@ def multiple_alignment(s, t, u):
             m -= 1
             n -= 1
             o -= 1
-        elif T[m][n][o] == T[m - 1][n][o]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
-            u_a.insert(0, '-')
-            m -= 1
-        elif T[m][n][o] == T[m][n - 1][o]:
-            s_a.insert(0, '-')
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, '-')
-            n -= 1
-        elif T[m][n][o] == T[m][n][o - 1]:
-            s_a.insert(0, '-')
-            t_a.insert(0, '-')
-            u_a.insert(0, u[o - 1])
-            o -= 1
+
         elif T[m][n][o] == T[m - 1][n - 1][o]:
             s_a.insert(0, s[m - 1])
             t_a.insert(0, t[n - 1])
@@ -580,6 +579,24 @@ def multiple_alignment(s, t, u):
             u_a.insert(0, u[o - 1])
             n -= 1
             o -= 1
+
+        elif T[m][n][o] == T[m - 1][n][o]:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            m -= 1
+        elif T[m][n][o] == T[m][n - 1][o]:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            n -= 1
+        elif T[m][n][o] == T[m][n][o - 1]:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            o -= 1
+
+
 
     while m > 0:
         s_a.insert(0, s[m - 1])
@@ -603,211 +620,6 @@ def multiple_alignment(s, t, u):
         u_a.insert(0, '-')
 
     return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a)
-
-
-
-
-
-
-def multiple_alignment_table4(s, t, u, v):
-    m = len(s)
-    n = len(t)
-    o = len(u)
-    p = len(v)
-
-    T = [[[[0 for _ in xrange(p + 1)] for _ in xrange(o + 1)] for _ in xrange(n + 1)] for _ in xrange(m + 1)]
-
-    for i in xrange(1, m + 1):
-        for j in xrange(1, n + 1):
-            for k in xrange(1, o + 1):
-                for l in xrange(1, p + 1):
-                    T[i][j][k][l] = max(
-                        T[i - 1][j - 1][k - 1][l - 1] + (0 if (s[i - 1] == t[j - 1] == u[k - 1] == v[l - 1]) else -1), 
-
-                        T[i - 1][j][k][l], 
-                        T[i][j - 1][k][l], 
-                        T[i][j][k - 1][l], 
-                        T[i][j][k][l - 1], 
-
-                        T[i - 1][j - 1][k][l], 
-                        T[i - 1][j][k - 1][l], 
-                        T[i - 1][j][k][l - 1],
-                        T[i][j - 1][k - 1][l], 
-                        T[i][j - 1][k][l - 1], 
-                        T[i][j][k - 1][l - 1], 
-
-                        T[i - 1][j - 1][k - 1][l],
-                        T[i - 1][j - 1][k][l - 1],
-                        T[i - 1][j][k - 1][l - 1],
-                        T[i][j - 1][k - 1][l - 1]
-                    )
-
-    return T
-
-
-def multiple_alignment4(s, t, u, v):
-    m   = len(s)
-    n   = len(t)
-    o   = len(u)
-    p   = len(v)
-
-    T   = multiple_alignment_table4(s, t, u, v)
-    e_d = T[m][n][o][p]
-
-    s_a = []
-    t_a = []
-    u_a = []
-    v_a = []
-
-    while m > 0 and n > 0 and o > 0:
-        if T[m][n][o][p] == T[m - 1][n - 1][o - 1][p - 1] + (0 if (s[m - 1] == t[n - 1] == u[o - 1] == v[p - 1]) else -1):
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, v[p - 1])
-            m -= 1
-            n -= 1
-            o -= 1
-            p -= 1
-
-
-        elif T[m][n][o][p] == T[m - 1][n][o][p]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
-            u_a.insert(0, '-')
-            v_a.insert(0, '-')
-            m -= 1
-        elif T[m][n][o][p] == T[m][n - 1][o][p]:
-            s_a.insert(0, '-')
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, '-')
-            v_a.insert(0, '-')
-            n -= 1
-        elif T[m][n][o][p] == T[m][n][o - 1][p]:
-            s_a.insert(0, '-')
-            t_a.insert(0, '-')
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, '-')
-            o -= 1
-        elif T[m][n][o][p] == T[m][n][o][p - 1]:
-            s_a.insert(0, '-')
-            t_a.insert(0, '-')
-            u_a.insert(0, '-')
-            v_a.insert(0, v[p - 1])
-            p -= 1
-
-
-        elif T[m][n][o][p] == T[m - 1][n - 1][o][p]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, '-')
-            v_a.insert(0, '-')
-            m -= 1
-            n -= 1
-        elif T[m][n][o][p] == T[m - 1][n][o - 1][p]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, '-')
-            m -= 1
-            o -= 1
-        elif T[m][n][o][p] == T[m - 1][n][o][p - 1]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
-            u_a.insert(0, '-')
-            v_a.insert(0, v[p - 1])
-            m -= 1
-            p -= 1
-
-
-        elif T[m][n][o][p] == T[m][n - 1][o - 1][p]:
-            s_a.insert(0, '-')
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, '-')
-            n -= 1
-            o -= 1
-        elif T[m][n][o][p] == T[m][n - 1][o][p - 1]:
-            s_a.insert(0, '-')
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, '-')
-            v_a.insert(0, v[p - 1])
-            n -= 1
-            p -= 1
-        elif T[m][n][o][p] == T[m][n][o - 1][p - 1]:
-            s_a.insert(0, '-')
-            t_a.insert(0, '-')
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, v[p - 1])
-            o -= 1
-            p -= 1
-
-
-        elif T[m][n][o][p] == T[m - 1][n - 1][o - 1][p]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, '-')
-            m -= 1
-            n -= 1
-            o -= 1
-        elif T[m][n][o][p] == T[m - 1][n - 1][o][p - 1]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, '-')
-            v_a.insert(0, v[p - 1])
-            m -= 1
-            n -= 1
-            p -= 1
-        elif T[m][n][o][p] == T[m - 1][n][o - 1][p - 1]:
-            s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, v[p - 1])
-            m -= 1
-            o -= 1
-            p -= 1
-        elif T[m][n][o][p] == T[m][n - 1][o - 1][p - 1]:
-            s_a.insert(0, '-')
-            t_a.insert(0, t[n - 1])
-            u_a.insert(0, u[o - 1])
-            v_a.insert(0, v[p - 1])
-            n -= 1
-            o -= 1
-            p -= 1
-
-
-    while m > 0:
-        s_a.insert(0, s[m - 1])
-        m -= 1
-
-    while n > 0:
-        t_a.insert(0, t[n - 1])
-        n -= 1
-
-    while o > 0:
-        u_a.insert(0, u[o - 1])
-        o -= 1
-
-    while p > 0:
-        v_a.insert(0, v[p - 1])
-        p -= 1
-
-    while len(s_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
-        s_a.insert(0, '-')
-
-    while len(t_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
-        t_a.insert(0, '-')
-
-    while len(u_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
-        u_a.insert(0, '-')
-
-    while len(v_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
-        v_a.insert(0, '-')
-
-    return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a), ''.join(v_a)
-
-
 
 
 
@@ -1211,4 +1023,215 @@ def multiple_approximate_pattern_matching(d, pattern, text, bwt, cm, fo, psa, if
             locations.append(start)
 
     return locations
+
+
+
+
+
+
+
+
+
+
+
+def quadruple_alignment_table(s, t, u, v):
+    m = len(s)
+    n = len(t)
+    o = len(u)
+    p = len(v)
+
+    T = [[[[0 for _ in xrange(p + 1)] for _ in xrange(o + 1)] for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            for k in xrange(1, o + 1):
+                for l in xrange(1, p + 1):
+                    T[i][j][k][l] = max(
+                        T[i - 1][j - 1][k - 1][l - 1] + (MATCH if (s[i - 1] == t[j - 1] == u[k - 1] == v[l - 1]) else MISMATCH), 
+
+                        T[i - 1][j][k][l] + GAP, 
+                        T[i][j - 1][k][l] + GAP, 
+                        T[i][j][k - 1][l] + GAP, 
+                        T[i][j][k][l - 1] + GAP, 
+
+                        T[i - 1][j - 1][k][l] + 2*GAP, 
+                        T[i - 1][j][k - 1][l] + 2*GAP, 
+                        T[i - 1][j][k][l - 1] + 2*GAP,
+                        T[i][j - 1][k - 1][l] + 2*GAP, 
+                        T[i][j - 1][k][l - 1] + 2*GAP, 
+                        T[i][j][k - 1][l - 1] + 2*GAP, 
+
+                        T[i - 1][j - 1][k - 1][l] + 3*GAP,
+                        T[i - 1][j - 1][k][l - 1] + 3*GAP,
+                        T[i - 1][j][k - 1][l - 1] + 3*GAP,
+                        T[i][j - 1][k - 1][l - 1] + 3*GAP
+                    )
+
+    return T
+
+
+def quadruple_alignment(s, t, u, v):
+    m   = len(s)
+    n   = len(t)
+    o   = len(u)
+    p   = len(v)
+
+    T   = quadruple_alignment_table(s, t, u, v)
+    e_d = T[m][n][o][p]
+
+    s_a = []
+    t_a = []
+    u_a = []
+    v_a = []
+
+    while m > 0 and n > 0 and o > 0 and p > 0:
+        if T[m][n][o][p] == T[m - 1][n - 1][o - 1][p - 1] + (MATCH if (s[m - 1] == t[n - 1] == u[o - 1] == v[p - 1]) else MISMATCH):
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            n -= 1
+            o -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m - 1][n - 1][o - 1][p] + 3*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            m -= 1
+            n -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m - 1][n - 1][o][p - 1] + 3*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            n -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o - 1][p - 1] + 3*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            o -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o - 1][p - 1] + 3*GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            n -= 1
+            o -= 1
+            p -= 1
+
+
+
+        elif T[m][n][o][p] == T[m - 1][n - 1][o][p] + 2*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            m -= 1
+            n -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o - 1][p] + 2*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            m -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m - 1][n][o][p - 1] + 2*GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            m -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m][n - 1][o - 1][p] + 2*GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            n -= 1
+            o -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o][p - 1] + 2*GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            n -= 1
+            p -= 1
+        elif T[m][n][o][p] == T[m][n][o - 1][p - 1] + 2*GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, v[p - 1])
+            o -= 1
+            p -= 1
+
+
+        elif T[m][n][o][p] == T[m - 1][n][o][p] + GAP:
+            s_a.insert(0, s[m - 1])
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            m -= 1
+        elif T[m][n][o][p] == T[m][n - 1][o][p] + GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
+            u_a.insert(0, '-')
+            v_a.insert(0, '-')
+            n -= 1
+        elif T[m][n][o][p] == T[m][n][o - 1][p] + GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, u[o - 1])
+            v_a.insert(0, '-')
+            o -= 1
+        elif T[m][n][o][p] == T[m][n][o][p - 1] + GAP:
+            s_a.insert(0, '-')
+            t_a.insert(0, '-')
+            u_a.insert(0, '-')
+            v_a.insert(0, v[p - 1])
+            p -= 1
+
+
+
+
+    while m > 0:
+        s_a.insert(0, s[m - 1])
+        m -= 1
+
+    while n > 0:
+        t_a.insert(0, t[n - 1])
+        n -= 1
+
+    while o > 0:
+        u_a.insert(0, u[o - 1])
+        o -= 1
+
+    while p > 0:
+        v_a.insert(0, v[p - 1])
+        p -= 1
+
+    while len(s_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        s_a.insert(0, '-')
+
+    while len(t_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        t_a.insert(0, '-')
+
+    while len(u_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        u_a.insert(0, '-')
+
+    while len(v_a) < max(len(s_a), len(t_a), len(u_a), len(v_a)):
+        v_a.insert(0, '-')
+
+    return e_d, ''.join(s_a), ''.join(t_a), ''.join(u_a), ''.join(v_a)
 

@@ -14,9 +14,9 @@ def main(argv):
     table = lines[1:]
     Q     = set()
 
-    for t in table:
-        A     = [taxa[i] for i in xrange(len(t)) if t[i] == '1']
-        B     = [taxa[i] for i in xrange(len(t)) if t[i] == '0']
+    for row in table:
+        A = [taxa[i] for i in xrange(len(row)) if row[i] == '1']
+        B = [taxa[i] for i in xrange(len(row)) if row[i] == '0']
 
         for p in product(combinations(A, 2), combinations(B, 2)):
             Q.add(frozenset(p))

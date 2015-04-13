@@ -26,3 +26,41 @@ def main(argv):
 
 if __name__ == "__main__":
     main(sys.argv[1:])
+
+
+
+
+    # tree = Tree('(dog,(cat,rabbit),(rat,(elephant,mouse)));', format = 1)
+    # print tree
+    # print 
+
+    # cand    = []
+    # for i in xrange(1, len(table)):
+    #     row = []
+    #     for j in xrange(length):
+    #         if table[i - 1][j] != table[i][j]:
+    #             row.append((i, j, species[j]))
+    #     cand.append(row)
+
+    # print cand
+    # print 
+
+    # output = '('
+    # for i in xrange(len(cand)):
+    #     if len(cand[i]) == 1:
+    #         output += cand[i][0][2]
+    #     else:
+    #         output += '('
+    #         output += ','.join(c[2] for c in cand[i])
+    #         output += ')'
+    #     if i != len(cand) - 1:
+    #         output += ','
+    # output += ');'
+
+    # print output
+    # print 
+
+    # tree = Tree(output, format = 1)
+    # print tree
+    # print 
+
