@@ -11,7 +11,10 @@ void update_table(vector< vector<int> > &D, string &s, string t, int k) {
 
     for(int i = 1; i <= m; i++) {
 
-        for(int j = max(1, i - k); j <= min(n, i + k); j++) {
+        int start = max(1, i - k);
+        int end   = min(n, i + k);
+
+        for(int j = start; j <= end; j++) {
 
             int mis = (s[i - 1] == t[j - 1]) ? D[i - 1][j - 1] : (D[i - 1][j - 1] - 1);
             int gap = max(D[i - 1][j] - 1, D[i][j - 1] - 1);
@@ -24,17 +27,18 @@ void update_table(vector< vector<int> > &D, string &s, string t, int k) {
 
 vector< vector<int> > create_matrix(int m, int k) {
 
-    vector< vector<int> > D(m + 1, vector<int>(m + k + 1));
+    vector< vector<int> > D(m + 1, vector<int>(m + k + 1, -99999));
+
+    D[0][0] = 0;
 
     for(int i = 1; i <= m; i++) {
 
-        fill(D[i].begin(), D[i].end(), -99999);
-        D[i][0] = D[i - 1][0] - 1;
+        D[i][0] = -i;
     }
 
     for(int j = 1; j <= m + k; j++) {
 
-        D[0][j] = D[0][j - 1] - 1;
+        D[0][j] = -j;
     }
 
     return D;
