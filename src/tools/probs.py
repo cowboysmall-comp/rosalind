@@ -34,16 +34,40 @@ def mendel2(k, N, p):
 
 def genetic_drift(N, m, g):
     T    = np.zeros(((2 * N) + 1, (2 * N) + 1))
-    S    = np.zeros(((2 * N) + 1))
-
-    S[m] = 1
 
     for i in xrange((2 * N) + 1):
         for j in xrange((2 * N) + 1):
             T[j, i] = binomial(2 * N, j, i / (2.0 * N))
 
-    for i in xrange(g):
+    S    = np.zeros(((2 * N) + 1))
+    S[m] = 1
+
+    for _ in xrange(g):
         S = T.dot(S)
 
     return S
+
+
+def founder_effect(A, N, m):
+    T      = np.zeros(((2 * N) + 1, (2 * N) + 1))
+
+    for i in xrange((2 * N) + 1):
+        for j in xrange((2 * N) + 1):
+            T[j, i] = binomial(2 * N, j, i / (2.0 * N))
+
+    length = len(A)
+    B      = [[0 for _ in xrange(length)] for _ in xrange(m)]
+
+    for i in xrange(length):
+        c    = A[i]
+
+        S    = np.zeros(((2 * N) + 1))
+        S[c] = 1
+
+        for j in xrange(m):
+            S       = T.dot(S)
+            B[j][i] = math.log10(S[0])
+
+    return B
+
 

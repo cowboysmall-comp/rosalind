@@ -294,3 +294,52 @@ def longest_substring(node, k):
 
     return sorted(strings)
 
+
+
+'''
+    slight variation of code found here:
+
+        http://stackoverflow.com/questions/14900693
+
+    which I found to be an elegant solution to the 
+    problem of enumerating unrooted binary trees.
+
+'''
+
+class SimpleNode:
+
+    def __init__(self, left, right):
+        self.left  = left
+        self.right = right
+
+    def __str__(self):
+        return '(%s,%s)' % (str(self.left), str(self.right))
+
+    def __repr__(self):
+        return self.__str__()
+
+
+def enumerate_unrooted(labels):
+    enumeration = []
+
+    def add_leaf(tree, label):
+        trees = []
+
+        trees.append(SimpleNode(tree, label))
+        if isinstance(tree, SimpleNode):
+            for left in add_leaf(tree.left, label):
+                trees.append(SimpleNode(left, tree.right))
+
+            for right in add_leaf(tree.right, label):
+                trees.append(SimpleNode(right, tree.left))
+
+        return trees
+
+    if len(labels) == 1:
+        enumeration.append(labels[0])
+    else:
+        for tree in enumerate_unrooted(labels[1:]):
+            for new_tree in add_leaf(tree, labels[0]):
+                enumeration.append(new_tree)
+
+    return enumeration
