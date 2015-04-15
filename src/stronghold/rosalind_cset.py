@@ -7,9 +7,10 @@ import phylogeny
 
 
 def main(argv):
-    table  = phylogeny.create_table(files.read_line(argv[0]))
+    lines = files.read_lines(argv[0])
+    table = phylogeny.find_consistent_character_table(lines)
 
-    print '\n'.join(''.join(str(r) for r in row) for row in table)
+    print '\n'.join(table)
 
 
 if __name__ == "__main__":
