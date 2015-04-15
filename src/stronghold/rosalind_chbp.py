@@ -2,6 +2,8 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
+import re
+
 import files
 
 from ete2 import Tree
@@ -22,19 +24,16 @@ def tree_from_character_table(species, table):
     while table:
         for row in table:
             if row.count('1') == 2:
-                index1 = row.find('1')
-                index2 = row.find('1', index1 + 1)
+                i1, i2     = [i.start() for i in re.finditer('1', row)]
+                n1, n2     = leaves[i1], leaves[i2]
 
-                node1  = leaves[index1]
-                node2  = leaves[index2]
-
-                leaves[index1] = root.add_child()
-                leaves[index1].add_child(node1.detach())
-                leaves[index1].add_child(node2.detach())
+                leaves[i1] = root.add_child()
+                leaves[i1].add_child(n1.detach())
+                leaves[i1].add_child(n2.detach())
 
                 table.remove(row)
-                leaves = leaves[:index2] + leaves[index2 + 1:]
-                table  = [row[:index2] + row[index2 + 1:] for row in table]
+                leaves     = leaves[:i2] + leaves[i2 + 1:]
+                table      = [row[:i2] + row[i2 + 1:] for row in table]
                 break
             else:
                 return None
