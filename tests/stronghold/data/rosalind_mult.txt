@@ -1,8 +1,8 @@
->Rosalind_1132
-ACTTGGTGA
->Rosalind_8898
-CAAATCGT
->Rosalind_9330
-TTCGCCTCC
->Rosalind_1964
-GGTCATGT
+>Rosalind_4386
+GCCTACACT
+>Rosalind_0755
+TCATTAAAGT
+>Rosalind_3290
+AGCAACAG
+>Rosalind_4684
+CTCCTCCGAA
