@@ -645,6 +645,11 @@ def pairwise_scores(strings):
     return total
 
 
+
+
+
+
+
 def quadruple_alignment_table(s, t, u, v):
     m = len(s)
     n = len(t)
