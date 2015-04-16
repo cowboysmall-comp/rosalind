@@ -17,12 +17,29 @@ def create_table(string):
 
         return split
 
-
     for node in tree.get_descendants():
         if not node.is_leaf():
             table.append(create_row(node, names))
 
     return table
+
+
+'''
+    the below split_distance can be implemented using the ete2 library:
+
+    def split_distance(taxa, strings):
+        tree1 = Tree(lines[1])
+        tree2 = Tree(lines[2])
+
+        return tree1.robinson_foulds(tree2, unrooted_trees = True)[0]
+
+'''
+
+def split_distance(taxa, strings):
+    splits1 = set([''.join(str(r) for r in row) for row in create_table(strings[0])])
+    splits2 = set([''.join(str(r) for r in row) for row in create_table(strings[1])])
+
+    return (2 * (len(taxa) - 3)) - (2 * (len(splits1 & splits2)))
 
 
 
