@@ -2,9 +2,6 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
-from itertools import product
-from operator  import add, mul
-
 import fasta
 import strings
 
