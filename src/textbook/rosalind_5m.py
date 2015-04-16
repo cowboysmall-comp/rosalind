@@ -4,12 +4,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import strings
-import table
 
 
 def main(argv):
-    lines    = files.read_lines(argv[0])
-    result   = strings.tripple_alignment(lines[0], lines[1], lines[2])
+    lines  = files.read_lines(argv[0])
+    result = strings.tripple_alignment(*lines)
 
     print result[0]
     print '\n'.join(result[1:])
