@@ -33,6 +33,8 @@ def create_table(string):
 
         return tree1.robinson_foulds(tree2, unrooted_trees = True)[0]
 
+    but it is really quite slow.
+
 '''
 
 def split_distance(taxa, strings):
