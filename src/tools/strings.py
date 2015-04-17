@@ -1,5 +1,5 @@
 from collections import defaultdict
-from itertools import combinations
+from itertools   import combinations
 
 import arrays
 import distance
@@ -29,7 +29,7 @@ def basic_alignment_table(s, t):
     return T
 
 
-def optimal_basic_alignment(s, t):
+def basic_alignment(s, t):
     m   = len(s)
     n   = len(t)
 
@@ -82,7 +82,7 @@ def count_basic_alignments(s, t):
     return alignments(m, n)
 
 
-def alignment_table(s, t, scoring, gap = -5):
+def optimal_alignment_table(s, t, scoring, gap = -5):
     m = len(s)
     n = len(t)
 
@@ -105,7 +105,7 @@ def optimal_alignment(s, t, scoring, gap = -5):
     m   = len(s)
     n   = len(t)
 
-    T   = alignment_table(s, t, scoring, gap)
+    T   = optimal_alignment_table(s, t, scoring, gap)
     e_d = T[m][n]
 
     s_a = []

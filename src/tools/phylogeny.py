@@ -1,10 +1,33 @@
 import re
 
-from ete2 import Tree
+from collections import defaultdict
+from itertools   import combinations, product
+from ete2        import Tree
+
+
+def create_table_from_strings(strings):
+    string = strings[0]
+    length = len(strings)
+    table  = []
+
+    def create_row(col, char, strings):
+        row = []
+
+        for string in strings:
+            row.append(1 if char == string[col] else 0)
+
+        return row
+
+    for col, char in enumerate(string):
+        row = create_row(col, char, strings)
+        if 1 < sum(row) < length - 1:
+            table.append(''.join(str(r) for r in row))
+
+    return table
 
 
 
-def create_table(string):
+def create_table_from_tree(string):
     tree  = Tree(string, format = 1)
     names = sorted(tree.get_leaf_names())
     table = []
@@ -19,9 +42,45 @@ def create_table(string):
 
     for node in tree.get_descendants():
         if not node.is_leaf():
-            table.append(create_row(node, names))
+            split = create_row(node, names)
+            table.append(''.join(str(s) for s in split))
 
     return table
+
+
+def quartets(taxa, table):
+    quartets = set()
+
+    for row in table:
+        A = [taxa[i] for i in xrange(len(row)) if row[i] == '1']
+        B = [taxa[i] for i in xrange(len(row)) if row[i] == '0']
+
+        for p in product(combinations(A, 2), combinations(B, 2)):
+            quartets.add(frozenset(p))
+
+    return quartets
+
+
+
+def count_common_quartets(table1, table2):
+    count = defaultdict(int)
+
+    for row in table1:
+        A = [i for i in xrange(len(row)) if row[i] == '1']
+        B = [i for i in xrange(len(row)) if row[i] == '0']
+
+        for p in product(combinations(A, 2), combinations(B, 2)):
+            count[p] += 1
+
+    for row in table2:
+        A = [i for i in xrange(len(row)) if row[i] == '1']
+        B = [i for i in xrange(len(row)) if row[i] == '0']
+
+        for p in product(combinations(A, 2), combinations(B, 2)):
+            count[p] += 1
+
+    return len([0 for key in count if count[key] > 1])
+
 
 
 '''
@@ -38,8 +97,8 @@ def create_table(string):
 '''
 
 def split_distance(taxa, strings):
-    splits1 = set([''.join(str(r) for r in row) for row in create_table(strings[0])])
-    splits2 = set([''.join(str(r) for r in row) for row in create_table(strings[1])])
+    splits1 = set(create_table_from_tree(strings[0]))
+    splits2 = set(create_table_from_tree(strings[1]))
 
     return (2 * (len(taxa) - 3)) - (2 * (len(splits1 & splits2)))
 

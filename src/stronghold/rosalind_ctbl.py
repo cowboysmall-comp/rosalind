@@ -7,9 +7,9 @@ import phylogeny
 
 
 def main(argv):
-    table  = phylogeny.create_table(files.read_line(argv[0]))
+    tree = files.read_line(argv[0])
 
-    print '\n'.join(''.join(str(r) for r in row) for row in table)
+    print '\n'.join(phylogeny.create_table_from_tree(tree))
 
 
 if __name__ == "__main__":

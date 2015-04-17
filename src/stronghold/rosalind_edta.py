@@ -8,7 +8,7 @@ import strings
 
 def main(argv):
     s, t   = fasta.read_ordered(argv[0])
-    result = strings.optimal_basic_alignment(s, t)
+    result = strings.basic_alignment(s, t)
 
     print result[0]
     print '\n'.join(result[1:])
