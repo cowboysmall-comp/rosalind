@@ -16,23 +16,31 @@ def main(argv):
 
     table1 = phylogeny.create_table_from_tree_and_leaves(trees[0], taxa)
 
-    print 'first tables created...'
-    print
+    # print 'first tables created...'
+    # print
 
     table2 = phylogeny.create_table_from_tree_and_leaves(trees[1], taxa)
 
-    print 'second tables created...'
-    print
+    # print table1
+    # print table2
+    # print table1 & table2
+    # print table1 - table2
+    # print table2 - table1
+    # print 
+
+    # print 'second tables created...'
+    # print
 
     count  = combinatorics.combinations(len(taxa), 4)
 
-    print 'count completed...'
-    print
+    # print 'count completed...'
+    # print
 
     common = phylogeny.count_common_quartets(table1, table2)
+    # common = phylogeny.count_common_quartets(trees[0], trees[1], taxa)
 
-    print 'common completed...'
-    print
+    # print 'common completed...'
+    # print
 
     print (2 * count) - (2 * common)
 

@@ -95,6 +95,8 @@ def quartets(taxa, table):
 #         for p in product(combinations(A, 2), combinations(B, 2)):
 #             count[p] += 1
 
+#     print 'part 1 completed...'
+
 #     for row in table2:
 #         A = [i for i in xrange(len(row)) if row[i] == '1']
 #         B = [i for i in xrange(len(row)) if row[i] == '0']
@@ -102,12 +104,38 @@ def quartets(taxa, table):
 #         for p in product(combinations(A, 2), combinations(B, 2)):
 #             count[p] += 1
 
-#     return len([0 for key in count if count[key] > 1])
+#     print 'part 2 completed...'
+
+#     # return len([0 for key in count if count[key] > 1])
+#     return len([count[key] for key in count if count[key] > 1])
+
+
+# def count_common_quartets(table1, table2):
+#     count = 0
+#     seen  = set()
+
+#     for row in table1:
+#         A = [i for i in xrange(len(row)) if row[i] == '1']
+#         B = [i for i in xrange(len(row)) if row[i] == '0']
+
+#         for p in product(combinations(A, 2), combinations(B, 2)):
+#             val = '{0:016b}{1:016b}{2:016b}{3:016b}'.format(int(p[0][0]), int(p[0][1]), int(p[1][0]), int(p[1][1]))
+#             seen.add(int(val, 2))
+
+#     for row in table2:
+#         A = [i for i in xrange(len(row)) if row[i] == '1']
+#         B = [i for i in xrange(len(row)) if row[i] == '0']
+
+#         for p in product(combinations(A, 2), combinations(B, 2)):
+#             val = '{0:016b}{1:016b}{2:016b}{3:016b}'.format(int(p[0][0]), int(p[0][1]), int(p[1][0]), int(p[1][1]))
+#             if int(val, 2) in seen:
+#                 count += 1
+
+#     return count
 
 
 def count_common_quartets(table1, table2):
-    count = 0
-    seen  = set()
+    count = defaultdict(int)
 
     for row in table1:
         for i in xrange(len(row) - 1):
@@ -118,7 +146,9 @@ def count_common_quartets(table1, table2):
                             if row[k] == '0':
                                 for l in xrange(k + 1, len(row)):
                                     if row[l] == '0':
-                                        seen.add(((i, j), (k, l)))
+                                        count[((i, j), (k, l))] += 1
+
+    print 'part 1 completed...'
 
     for row in table2:
         for i in xrange(len(row) - 1):
@@ -129,10 +159,12 @@ def count_common_quartets(table1, table2):
                             if row[k] == '0':
                                 for l in xrange(k + 1, len(row)):
                                     if row[l] == '0':
-                                        if ((i, j), (k, l)) in seen:
-                                            count += 1
+                                        count[((i, j), (k, l))] += 1
 
-    return count
+    print 'part 2 completed...'
+
+    return len([count[key] for key in count if count[key] > 1])
+
 
 
 
