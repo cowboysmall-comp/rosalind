@@ -10,7 +10,7 @@ def create_table_from_strings(strings):
     length = len(strings)
     table  = []
 
-    def create_row(col, char, strings):
+    def create_row(col, char):
         row = []
 
         for string in strings:
@@ -19,7 +19,7 @@ def create_table_from_strings(strings):
         return row
 
     for col, char in enumerate(string):
-        row = create_row(col, char, strings)
+        row = create_row(col, char)
         if 1 < sum(row) < length - 1:
             table.append(''.join(str(r) for r in row))
 
@@ -28,12 +28,13 @@ def create_table_from_strings(strings):
 
 
 def create_table_from_tree(string):
-    tree  = Tree(string, format = 1)
-    names = sorted(tree.get_leaf_names())
-    table = []
+    tree   = Tree(string, format = 1)
+    names  = sorted(tree.get_leaf_names())
+    length = len(names)
+    table  = []
 
-    def create_row(node, names):
-        split = [0] * len(names)
+    def create_row(node):
+        split = [0] * length
 
         for leaf in node:
             split[names.index(leaf.name)] = 1
@@ -42,10 +43,11 @@ def create_table_from_tree(string):
 
     for node in tree.get_descendants():
         if not node.is_leaf():
-            split = create_row(node, names)
+            split = create_row(node)
             table.append(''.join(str(s) for s in split))
 
     return table
+
 
 
 def quartets(taxa, table):
@@ -63,23 +65,27 @@ def quartets(taxa, table):
 
 
 def count_common_quartets(table1, table2):
-    count = defaultdict(int)
+    count = 0
+    seen  = set()
 
     for row in table1:
         A = [i for i in xrange(len(row)) if row[i] == '1']
         B = [i for i in xrange(len(row)) if row[i] == '0']
 
         for p in product(combinations(A, 2), combinations(B, 2)):
-            count[p] += 1
+            val = '{0:016b}{1:016b}{2:016b}{3:016b}'.format(int(p[0][0]), int(p[0][1]), int(p[1][0]), int(p[1][1]))
+            seen.add(int(val, 2))
 
     for row in table2:
         A = [i for i in xrange(len(row)) if row[i] == '1']
         B = [i for i in xrange(len(row)) if row[i] == '0']
 
         for p in product(combinations(A, 2), combinations(B, 2)):
-            count[p] += 1
+            val = '{0:016b}{1:016b}{2:016b}{3:016b}'.format(int(p[0][0]), int(p[0][1]), int(p[1][0]), int(p[1][1]))
+            if int(val, 2) in seen:
+                count += 1
 
-    return len([0 for key in count if count[key] > 1])
+    return count
 
 
 
