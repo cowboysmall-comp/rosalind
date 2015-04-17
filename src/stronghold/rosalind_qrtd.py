@@ -14,10 +14,27 @@ def main(argv):
     taxa   = lines[0].split()
     trees  = lines[1:]
 
-    table1 = phylogeny.create_table_from_tree(trees[0])
-    table2 = phylogeny.create_table_from_tree(trees[1])
+    table1 = phylogeny.create_table_from_tree_and_leaves(trees[0], taxa)
 
-    print (2 * combinatorics.combinations(len(taxa), 4)) - (2 * phylogeny.count_common_quartets(table1, table2))
+    print 'first tables created...'
+    print
+
+    table2 = phylogeny.create_table_from_tree_and_leaves(trees[1], taxa)
+
+    print 'second tables created...'
+    print
+
+    count  = combinatorics.combinations(len(taxa), 4)
+
+    print 'count completed...'
+    print
+
+    common = phylogeny.count_common_quartets(table1, table2)
+
+    print 'common completed...'
+    print
+
+    print (2 * count) - (2 * common)
 
 
 if __name__ == "__main__":
