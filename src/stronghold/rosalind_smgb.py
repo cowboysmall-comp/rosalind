@@ -11,7 +11,7 @@ def main(argv):
     result = strings.semi_global_alignment(s, t)
 
     print result[0]
-    print '\n'.join(result for result in result[1:])
+    print '\n'.join(r for r in result[1:])
 
 
 if __name__ == "__main__":

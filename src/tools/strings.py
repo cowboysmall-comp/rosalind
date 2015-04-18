@@ -116,6 +116,10 @@ def semi_global_alignment_table(s, t):
         if M[0] < T[i][n]:
             M = (T[i][n], i, n)
 
+    for j in xrange(n, 0, -1):
+        if M[0] < T[m][j]:
+            M = (T[m][j], m, j)
+
     return T, M
 
 
@@ -134,20 +138,25 @@ def semi_global_alignment(s, t):
         t_a.insert(0, '-')
         m -= 1
 
+    while n > M[2]:
+        s_a.insert(0, '-')
+        t_a.insert(0, t[n - 1])
+        n -= 1
+
     while m > 0 and n > 0:
-        if T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -1):
+        if T[m][n] == T[m - 1][n] - 1:
             s_a.insert(0, s[m - 1])
-            t_a.insert(0, t[n - 1])
+            t_a.insert(0, '-')
             m -= 1
-            n -= 1
         elif T[m][n] == T[m][n - 1] - 1:
             s_a.insert(0, '-')
             t_a.insert(0, t[n - 1])
             n -= 1
-        elif T[m][n] == T[m - 1][n] - 1:
+        elif T[m][n] == T[m - 1][n - 1] + (1 if s[m - 1] == t[n - 1] else -1):
             s_a.insert(0, s[m - 1])
-            t_a.insert(0, '-')
+            t_a.insert(0, t[n - 1])
             m -= 1
+            n -= 1
 
     while m > 0:
         s_a.insert(0, s[m - 1])
