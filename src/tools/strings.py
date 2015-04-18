@@ -82,6 +82,25 @@ def count_basic_alignments(s, t):
     return alignments(m, n)
 
 
+def mismatch_alignment_table(s, t):
+    m = len(s)
+    n = len(t)
+
+    T = [[0 for _ in xrange(n + 1)] for _ in xrange(m + 1)]
+
+    for i in xrange(1, m + 1):
+        T[i][0] = -i
+
+    for j in xrange(1, n + 1):
+        T[0][j] = -j
+
+    for i in xrange(1, m + 1):
+        for j in xrange(1, n + 1):
+            T[i][j] = max(T[i - 1][j - 1] + (1 if s[i - 1] == t[j - 1] else -1), T[i - 1][j] - 1, T[i][j - 1] - 1)
+
+    return T
+
+
 def optimal_alignment_table(s, t, scoring, gap = -5):
     m = len(s)
     n = len(t)
