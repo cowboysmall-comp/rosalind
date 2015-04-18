@@ -18,6 +18,24 @@ def read_ordered(file_path):
     return [strings[label] for label in labels]
 
 
+
+def read_ordered_from(obj):
+    strings = defaultdict(str)
+    labels  = []
+
+    label = None
+    for line in obj:
+        line = line.strip()
+        if line.startswith('>'):
+            label = line[1:]
+            labels.append(label)
+        else:
+            strings[label] += line
+
+    return [strings[label] for label in labels]
+
+
+
 def read(file_path):
     strings = defaultdict(str)
 
@@ -33,6 +51,22 @@ def read(file_path):
     return strings
 
 
+
+def read_from(obj):
+    strings = defaultdict(str)
+
+    label = None
+    for line in obj:
+        line = line.strip()
+        if line.startswith('>'):
+            label = line[1:]
+        else:
+            strings[label] += line
+
+    return strings
+
+
+
 def read_one(file_path):
     string = ''
 
@@ -43,6 +77,7 @@ def read_one(file_path):
                 string += line
 
     return string
+
 
 
 def read_one_from(obj):
