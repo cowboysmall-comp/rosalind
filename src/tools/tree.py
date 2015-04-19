@@ -1,3 +1,4 @@
+from collections import deque
 
 
 class Node:
@@ -11,6 +12,10 @@ class Node:
 
     def get_root(self):
         return self if self.is_root() else self.parent.get_root()
+
+
+    def get_children(self):
+        return self.children
 
 
     def is_root(self):
@@ -60,6 +65,25 @@ class Node:
 
     def __repr__(self):
         return self.__str__()
+
+
+
+
+def level_order_traversal(node):
+    Q     = deque([node, None])
+    level = 0
+
+    while Q:
+        node = Q.popleft()
+        if node:
+            if not node.is_leaf():
+                for child in node.get_children():
+                    Q.append(child)
+            yield (level, node)
+        else:
+            if Q:
+                level += 1
+                Q.append(None)
 
 
 
@@ -343,3 +367,4 @@ def enumerate_unrooted(labels):
                 enumeration.append(new_tree)
 
     return enumeration
+

@@ -255,3 +255,43 @@ def find_consistent_character_table(table):
 
     return None
 
+
+
+def small_parsimony(tree, strings):
+    tree   = Tree(tree, format = 1)
+    length = len(strings.values()[0])
+
+    S      = defaultdict(dict)
+    L      = defaultdict(str)
+    Z      = [0]
+
+    def forward_pass():
+        for i in xrange(length):
+            for node in tree.traverse('postorder'):
+                if node.is_leaf():
+                    S[node.name][i] = {strings[node.name][i]}
+                else:
+                    children = node.get_children()
+                    s1 = S[children[0].name][i] & S[children[1].name][i]
+                    if s1:
+                        S[node.name][i] = s1
+                    else:
+                        S[node.name][i] = S[children[0].name][i] | S[children[1].name][i]
+                        Z[0] += 1
+
+    def backward_pass():
+        for i in xrange(length):
+            for node in tree.traverse('preorder'):
+                if not node.up:
+                    L[node.name] += S[node.name][i].pop()
+                else:
+                    if L[node.up.name][i] in S[node.name][i]:
+                        L[node.name] += L[node.up.name][i]
+                    else:
+                        L[node.name] += S[node.name][i].pop()
+
+    forward_pass()
+    backward_pass()
+
+    return Z[0], {key: value for key, value in L.iteritems() if key not in strings}
+
