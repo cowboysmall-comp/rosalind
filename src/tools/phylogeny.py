@@ -295,3 +295,44 @@ def small_parsimony(tree, strings):
 
     return Z[0], {key: value for key, value in L.iteritems() if key not in strings}
 
+
+
+
+def reverse_substitutions(tree, strings):
+    length = len(strings.values()[0])
+    tree   = Tree(tree, format = 1)
+    found  = []
+
+    def find_reversing_substitutions(node, position, orig = None, subs = None):
+        paths = []
+        char  = strings[node.name][position]
+
+        if not orig:
+            for child in node.get_children():
+                for path in find_reversing_substitutions(child, position, orig = char):
+                    paths.append([node] + path)
+
+        elif not subs:
+            if strings[node.name][position] != orig:
+                for child in node.get_children():
+                    for path in find_reversing_substitutions(child, position, orig, subs = char):
+                        paths.append([node] + path)
+
+        elif strings[node.name][position] == subs:
+            for child in node.get_children():
+                for path in find_reversing_substitutions(child, position, orig, subs):
+                    paths.append([node] + path)
+
+        elif strings[node.name][position] == orig:
+            paths.append([node])
+
+        return paths
+
+    for node in tree.traverse('preorder'):
+        for i in xrange(length):
+            for path in find_reversing_substitutions(node, i):
+                found.append((path, i))
+
+    return found
+
+
