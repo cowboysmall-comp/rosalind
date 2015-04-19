@@ -313,17 +313,17 @@ def reverse_substitutions(tree, strings):
                     paths.append([node] + path)
 
         elif not subs:
-            if strings[node.name][position] != orig:
+            if char != orig:
                 for child in node.get_children():
                     for path in find_reversing_substitutions(child, position, orig, subs = char):
                         paths.append([node] + path)
 
-        elif strings[node.name][position] == subs:
+        elif char == subs:
             for child in node.get_children():
                 for path in find_reversing_substitutions(child, position, orig, subs):
                     paths.append([node] + path)
 
-        elif strings[node.name][position] == orig:
+        elif char == orig:
             paths.append([node])
 
         return paths
