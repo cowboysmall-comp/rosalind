@@ -7,15 +7,12 @@ import fasta
 import phylogeny
 
 
-
 def main(argv):
     lines   = files.read_lines(argv[0])
     tree    = lines[0]
     strings = fasta.read_from(lines[1:])
 
-
     output = []
-
     for r in phylogeny.reverse_substitutions(tree, strings):
         path        = r[0]
         position    = r[1]

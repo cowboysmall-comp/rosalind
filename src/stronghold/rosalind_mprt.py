@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 import files
 import uniprot
 import genetics
-import re
 
 
 def main(argv):

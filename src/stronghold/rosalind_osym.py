@@ -14,7 +14,6 @@ def main(argv):
     T2    = strings.mismatch_alignment_table(s[::-1], t[::-1])
 
     total = 0
-
     for i in xrange(1, m + 1):
         for j in xrange(1, n + 1):
             total += T1[i - 1][j - 1] + T2[m - i][n - j] + (1 if s[i - 1] == t[j - 1] else -1)

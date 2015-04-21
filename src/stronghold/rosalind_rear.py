@@ -11,10 +11,8 @@ def main(argv):
     lines = files.read_lines_of_ints(argv[0])
 
     D = []
-
     for i in xrange(0, len(lines), 2):
         perm1, perm2 = lines[i:i + 2]
-
         final_perm   = permutations.composition(permutations.inverse(perm2), perm1)
         D.append(sorts.reversal_sort(final_perm))
 

@@ -3,7 +3,6 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import arrays
 import tree
 
 

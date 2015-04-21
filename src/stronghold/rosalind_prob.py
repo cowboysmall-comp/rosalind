@@ -10,7 +10,6 @@ def main(argv):
     with open(argv[0]) as file:
         dna = file.readline().strip()
         A   = [float(item) for item in file.readline().split()]
-
         B   = [math.log10(probs.gc(dna, a)) for a in A]
 
         print ' '.join('%0.3f' % b for b in B)

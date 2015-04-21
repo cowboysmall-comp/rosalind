@@ -15,8 +15,8 @@ def main(argv):
         lines    = file.readlines()
         proteins = [protein.strip() for protein in lines[:n]]
         R        = [float(line) for line in lines[n:]]
-        M        = []
 
+        M        = []
         for protein in proteins:
             S       = genetics.complete_spectrum(protein, mass)
             mult    = multisets.multiplicity(multisets.minkowski_difference(R, S))
