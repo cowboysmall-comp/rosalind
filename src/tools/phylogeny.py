@@ -303,27 +303,37 @@ def reverse_substitutions(tree, strings):
     tree   = Tree(tree, format = 1)
     found  = []
 
-    def find_reversing_substitutions(node, position, orig = None, subs = None):
+    def find_reversing_substitutions(node, position):
         paths = []
         char  = strings[node.name][position]
 
-        if not orig:
+        for child in node.get_children():
+            for path in find_substituted(child, position, char):
+                paths.append([node] + path)
+
+        return paths
+
+    def find_substituted(node, position, original):
+        paths = []
+        char  = strings[node.name][position]
+
+        if char != original:
             for child in node.get_children():
-                for path in find_reversing_substitutions(child, position, char):
+                for path in find_reverted(child, position, original, char):
                     paths.append([node] + path)
 
-        elif not subs:
-            if char != orig:
-                for child in node.get_children():
-                    for path in find_reversing_substitutions(child, position, orig, char):
-                        paths.append([node] + path)
+        return paths
 
-        elif char == subs:
+    def find_reverted(node, position, original, substituted):
+        paths = []
+        char  = strings[node.name][position]
+
+        if char == substituted:
             for child in node.get_children():
-                for path in find_reversing_substitutions(child, position, orig, subs):
+                for path in find_reverted(child, position, original, char):
                     paths.append([node] + path)
 
-        elif char == orig:
+        elif char == original:
             paths.append([node])
 
         return paths
