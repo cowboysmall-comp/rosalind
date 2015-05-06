@@ -7,15 +7,14 @@ import searches
 
 
 def main(argv):
-    with open(argv[0]) as file:
-        n     = int(file.readline().strip())
-        m     = int(file.readline().strip())
-        A     = [int(a) for a in file.readline().split()]
-        ids   = [int(i) for i in file.readline().split()]
+    data  = files.read_lines_of_ints(argv[0])
+    n     = data[0][0]
+    m     = data[1][0]
+    A     = data[2]
+    ids   = data[3]
+    found = [searches.binary_search(A, i, 0, n - 1) for i in ids]
 
-        found = [searches.binary_search(A, i, 1, n) for i in ids]
-
-        print ' '.join(str(f) for f in found)
+    print ' '.join(str(f + 1) if f != -1 else '-1' for f in found)
 
 
 

@@ -7,8 +7,8 @@ import phylogeny
 
 
 def main(argv):
-    lines  = files.read_lines(argv[0])
-    taxa   = lines[0].split()
+    lines = files.read_lines(argv[0])
+    taxa  = lines[0].split()
 
     print phylogeny.split_distance(taxa, lines[1:])
 

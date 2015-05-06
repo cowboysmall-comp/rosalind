@@ -10,7 +10,6 @@ def main(argv):
     dna_strings = fasta.read_ordered(argv[0])
     results     = strings.quadruple_alignment(*dna_strings)
 
-    # print strings.pairwise_scores(results[1:])
     print results[0]
     print '\n'.join(results[1:])
 

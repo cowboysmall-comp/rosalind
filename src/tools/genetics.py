@@ -122,6 +122,57 @@ def reconstruct_strings_from_maximal_paths(maximal):
     return sorted(strings)
 
 
+
+'''
+    original implementation:
+
+    def split_strings(strings):
+        correct   = set()
+        incorrect = set()
+
+        for string in strings:
+            comp = genetics.dna_complement(string)
+            if strings.count(string) + strings.count(comp) > 1:
+                correct.add(string)
+            else:
+                incorrect.add(string)
+
+        return correct, incorrect
+
+
+    def find_corrections(strings):
+        corrections        = set()
+        correct, incorrect = split_strings(strings)
+
+        for c in correct:
+            comp = genetics.dna_complement(c)
+            for i in incorrect:
+                if distance.hamming(i, c) == 1:
+                    corrections.add((i, c))
+                elif distance.hamming(i, comp) == 1:
+                    corrections.add((i, comp))
+
+        return corrections
+
+'''
+
+
+def find_corrections_in_reads(reads):
+    corrections = set()
+
+    creads      = reads + [dna_complement(r) for r in reads]
+    correct     = set([r for r in creads if creads.count(r) > 1])
+    incorrect   = set(reads) - correct
+
+    for i in incorrect:
+        for c in correct:
+            if distance.hamming(i, c) == 1:
+                corrections.add((i, c))
+
+    return corrections
+
+
+
 def assemble_genome_from_reads(reads):
     length = len(reads[0])
 

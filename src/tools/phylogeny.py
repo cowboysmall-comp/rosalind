@@ -49,6 +49,7 @@ def create_table_from_tree(string):
     return table
 
 
+
 def create_table_from_tree_and_leaves(string, leaves):
     tree   = Tree(string, format = 1)
     names  = sorted(leaves)
@@ -71,6 +72,7 @@ def create_table_from_tree_and_leaves(string, leaves):
     return table
 
 
+
 def quartets(taxa, table):
     quartets = set()
 
@@ -82,6 +84,7 @@ def quartets(taxa, table):
             quartets.add(frozenset(p))
 
     return quartets
+
 
 
 '''
@@ -167,7 +170,6 @@ def count_common_quartets(table1, table2):
             count[p] += 1
 
     return len([count[key] for key in count if count[key] > 1])
-
 
 
 
@@ -263,38 +265,32 @@ def small_parsimony(tree, strings):
 
     S      = defaultdict(dict)
     L      = defaultdict(str)
-    Z      = [0]
+    Z      = 0
 
-    def forward_pass():
-        for i in xrange(length):
-            for node in tree.traverse('postorder'):
-                if node.is_leaf():
-                    S[node.name][i] = {strings[node.name][i]}
+    for i in xrange(length):
+        for node in tree.traverse('postorder'):
+            if node.is_leaf():
+                S[node.name][i] = {strings[node.name][i]}
+            else:
+                children = node.get_children()
+                s1 = S[children[0].name][i] & S[children[1].name][i]
+                if s1:
+                    S[node.name][i] = s1
                 else:
-                    children = node.get_children()
-                    s1 = S[children[0].name][i] & S[children[1].name][i]
-                    if s1:
-                        S[node.name][i] = s1
-                    else:
-                        S[node.name][i] = S[children[0].name][i] | S[children[1].name][i]
-                        Z[0] += 1
+                    S[node.name][i] = S[children[0].name][i] | S[children[1].name][i]
+                    Z += 1
 
-    def backward_pass():
-        for i in xrange(length):
-            for node in tree.traverse('preorder'):
-                if not node.up:
+    for i in xrange(length):
+        for node in tree.traverse('preorder'):
+            if not node.up:
+                L[node.name] += S[node.name][i].pop()
+            else:
+                if L[node.up.name][i] in S[node.name][i]:
+                    L[node.name] += L[node.up.name][i]
+                else:
                     L[node.name] += S[node.name][i].pop()
-                else:
-                    if L[node.up.name][i] in S[node.name][i]:
-                        L[node.name] += L[node.up.name][i]
-                    else:
-                        L[node.name] += S[node.name][i].pop()
 
-    forward_pass()
-    backward_pass()
-
-    return Z[0], {key: value for key, value in L.iteritems() if key not in strings}
-
+    return Z, {key: value for key, value in L.iteritems() if key not in strings}
 
 
 

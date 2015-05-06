@@ -7,7 +7,7 @@ import combinatorics
 
 
 def main(argv):
-    n   = files.read_int(argv[0])
+    n = files.read_int(argv[0])
 
     print combinatorics.double_factorial(2 * n - 5) % 1000000
 
