@@ -1140,26 +1140,53 @@ def shortest_superstring(strings):
 
 
 '''
-
-    this is the original version of longest common subsequence. Slightly 
-    naieve and brute force, but works perfectly. The current version makes 
-    use of binary search to reduce the problem space - O(log(N) )
+    this is my original version of longest common substring. Very 
+    naieve and brute force, but works perfectly. In fact, it's not 
+    a little daft because it makes no assumptions about the nature 
+    of the problem:
 
     def longest_common_substring(strings):
-        longest = ''
+        strings = sorted(strings, key = len)
+
         string  = strings[0]
+        longest = ''
 
         for i in xrange(len(string)):
             for j in xrange(i, len(string)):
                 current = string[i:j + 1]
-                if all(current in s for s in strings) and len(longest) < len(current):
+                if all(current in s for s in strings[1:]) and len(longest) < len(current):
                     longest = current
 
         return longest
 
+
+    here is a better implementation that makes use of a few properties 
+    of the longest common subsequence:
+
+    def longest_common_substring(strings):
+        strings = sorted(strings, key = len)
+
+        search  = strings[0]
+        length  = len(search)
+        strings = strings[1:]
+
+        for l in xrange(length, 0, -1):
+            for s in xrange(length - l + 1):
+                current = search[s:s + l]
+                if all(current in string for string in strings):
+                    return current
+
+        return ''
+
+
+    The current version makes use of binary search to reduce the problem 
+    space - O(log(N) * N * K)
+
 '''
 
 def longest_common_substring(strings):
+    strings = sorted(strings, key = len)
+
     string  = strings[0]
     length  = len(string)
     strings = strings[1:]
@@ -1169,7 +1196,7 @@ def longest_common_substring(strings):
             cs = string[i:i + l + 1]
             if all(cs in s for s in strings):
                 return cs
-        return None
+        return ''
 
     low     = 0
     high    = length
