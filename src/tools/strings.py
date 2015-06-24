@@ -1139,17 +1139,49 @@ def shortest_superstring(strings):
     return strings[0]
 
 
+'''
+
+    this is the original version of longest common subsequence. Slightly 
+    naieve and brute force, but works perfectly. The current version makes 
+    use of binary search to reduce the problem space - O(log(N) )
+
+    def longest_common_substring(strings):
+        longest = ''
+        string  = strings[0]
+
+        for i in xrange(len(string)):
+            for j in xrange(i, len(string)):
+                current = string[i:j + 1]
+                if all(current in s for s in strings) and len(longest) < len(current):
+                    longest = current
+
+        return longest
+
+'''
+
 def longest_common_substring(strings):
-    longest = ''
     string  = strings[0]
+    length  = len(string)
+    strings = strings[1:]
 
-    for i in xrange(len(string)):
-        for j in xrange(i, len(string) + 1):
-            current = string[i:j]
-            if len(longest) < len(current) and all(current in s for s in strings):
-                longest = current
+    def common_substring(l):
+        for i in xrange(length - l + 1):
+            cs = string[i:i + l + 1]
+            if all(cs in s for s in strings):
+                return cs
+        return None
 
-    return longest
+    low     = 0
+    high    = length
+
+    while low + 1 < high:
+        mid = low + (high - low) // 2
+        if common_substring(mid):
+            low  = mid
+        else:
+            high = mid
+
+    return common_substring(low)
 
 
 def interwoven_sequences(string1, string2):
