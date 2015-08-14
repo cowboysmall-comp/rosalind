@@ -1,0 +1,6 @@
+>Rosalind_1
+GGAAA
+>Rosalind_2
+GGAAA
+>Rosalind_3
+GGAAA
