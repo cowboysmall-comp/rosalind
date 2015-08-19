@@ -11,8 +11,11 @@ import distance
 import graphs
 
 
-DNA_COMPLEMENT = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
-RNA_COMPLEMENT = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
+DNA_COMPLEMENT   = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+RNA_COMPLEMENT   = {'A': 'U', 'U': 'A', 'C': 'G', 'G': 'C'}
+
+SYMBOL_TO_NUMBER = {'A': 0, 'C': 1, 'G': 2, 'T': 3}
+NUMBER_TO_SYMBOL = {0: 'A', 1: 'C', 2: 'G', 3: 'T'}
 
 
 def dna_complement(string):
@@ -250,6 +253,46 @@ def kmer_frequency_table_mismatches(string, k, d, complements = False):
             stats[kmer] += len(approximate_pattern_matching(dna_complement(kmer), string, d))
 
     return stats
+
+
+def pattern_to_number(dna):
+    if not dna:
+        return 0
+    return 4 * pattern_to_number(dna[:-1]) + SYMBOL_TO_NUMBER[dna[-1]]
+
+
+def number_to_pattern(index, k):
+    if k == 1:
+        return NUMBER_TO_SYMBOL[index]
+    return number_to_pattern(index / 4, k - 1) + NUMBER_TO_SYMBOL[index % 4]
+
+
+def kmer_frequency_array(dna, k):
+    freqs = [0 for _ in xrange(4 ** k)]
+
+    for i in xrange(len(dna) - k + 1):
+        freqs[pattern_to_number(dna[i:i + k])] += 1
+
+    return freqs
+
+
+def neighbourhood(pattern, d):
+    if d == 0:
+        return {pattern}
+
+    if len(pattern) == 1:
+        return {'A', 'C', 'G', 'T'}
+
+    hood = set()
+    for text in neighbourhood(pattern[1:], d):
+        if distance.hamming(pattern[1:], text) < d:
+            for x in ['A', 'C', 'G', 'T']:
+                hood.add(x + text)
+        else:
+            hood.add(pattern[0] + text)
+
+    return hood
+
 
 
 '''
@@ -732,7 +775,7 @@ def convolution_frequent(counts, M):
     return [[item[1]] for item in ordered[:M]]
 
 
-def sigma_distance(strings, kmer):
+def sigma_distance(kmer, strings):
     k    = len(kmer)
     dist = 0
 
@@ -755,7 +798,7 @@ def median_string(strings, k):
     median = None
 
     for kmer in kmers:
-        d = sigma_distance(strings, kmer)
+        d = sigma_distance(kmer, strings)
         if dist >= d:
             dist   = d
             median = kmer
