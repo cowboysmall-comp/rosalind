@@ -83,7 +83,6 @@ def count_inversions(A):
     return c
 
 
-
 def indexed_text_array(text):
     indexed = []
     counter = defaultdict(int)
