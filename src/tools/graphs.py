@@ -387,6 +387,38 @@ def bellman_ford(s, nodes, edges):
     return distances
 
 
+'''
+    alternative implementation
+
+    def topological_sort(nodes, edges):
+        ordering = []
+        marked   = defaultdict(int)
+        explored = defaultdict(int)
+
+        def topological(node):
+            if not marked[node]:
+                if not explored[node]:
+                    marked[node]   += 1
+
+                    for edge in edges:
+                        if node == edge[0]:
+                            topological(edge[1])
+
+                    explored[node] += 1
+                    marked[node]   -= 1
+
+                    ordering.insert(0, node)
+
+        for node in nodes:
+            if explored[node] == 0:
+                topological(node)
+
+        return ordering
+
+'''
+
+
+
 def topological_sort(nodes, edges):
     ordering = []
     explored = defaultdict(int)
@@ -510,8 +542,8 @@ def maximal_non_branching_paths(edges):
     edges = [edge for edge in edges if edge[0] in ones and edge[1] in ones]
 
     while edges:
-        cycle = eulerian_cycle(edges[0], edges)
-        for edge in cycle:
+        cycle = eulerian_cycle(edges[0][1], edges)
+        for edge in filter(lambda x: x[0] in cycle or x[1] in cycle, edges):
             edges.remove(edge)
         paths.append(cycle)
 

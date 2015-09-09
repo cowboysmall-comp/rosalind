@@ -17,7 +17,7 @@ def main(argv):
 
     counts   = genetics.convolution_counts(spectrum)
     masses   = genetics.convolution_frequent(counts, M)
-    match    = genetics.leaderboard_matching_peptides(masses, [0] + spectrum, N, int_mass)
+    match    = genetics.leaderboard_matching_peptides(masses, [0] + spectrum, N)
 
     print '-'.join(str(m) for m in match[1])
 

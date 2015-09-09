@@ -667,7 +667,7 @@ def masses_from_cyclo_spectrum(spectrum):
     return masses
 
 
-def cyclo_spectrum(masses, table):
+def cyclo_spectrum(masses):
     length   = len(masses)
     spectrum = [0, sum(masses)]
     masses   = masses * 2
@@ -679,7 +679,7 @@ def cyclo_spectrum(masses, table):
     return sorted(spectrum)
 
 
-def linear_spectrum(masses, table):
+def linear_spectrum(masses):
     length   = len(masses)
     spectrum = [0, sum(masses)]
 
@@ -690,13 +690,13 @@ def linear_spectrum(masses, table):
     return sorted(spectrum)
 
 
-def matching_peptides(masses, spectrum, table):
+def matching_peptides(masses, spectrum):
     candidates = masses[:]
     matches    = []
 
     while candidates:
         for candidate in candidates[:]:
-            if set(linear_spectrum(candidate, table)) < set(spectrum):
+            if set(linear_spectrum(candidate)) < set(spectrum):
                 if sum(candidate) == spectrum[-1]:
                     matches.append(candidate)
                     candidates.remove(candidate)
@@ -707,7 +707,7 @@ def matching_peptides(masses, spectrum, table):
     return matches
 
 
-def leaderboard_matching_peptides(masses, spectrum, N, table):
+def leaderboard_matching_peptides(masses, spectrum, N):
     leader  = (0, [])
     leaders = [leader]
 
@@ -720,7 +720,7 @@ def leaderboard_matching_peptides(masses, spectrum, N, table):
             for mass in masses:
                 expand = leader[1] + mass
                 if sum(expand) <= spectrum[-1]:
-                    expanded.append((score(cyclo_spectrum(expand, table), spectrum), expand))
+                    expanded.append((score(cyclo_spectrum(expand), spectrum), expand))
         return expanded
 
     def cut(candidates, count):

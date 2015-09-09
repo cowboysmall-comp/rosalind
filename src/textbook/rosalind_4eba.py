@@ -12,7 +12,7 @@ def main(argv):
     spectrum = files.read_line_of_ints(argv[1])
 
     masses   = genetics.masses_from_cyclo_spectrum(spectrum)
-    matches  = genetics.matching_peptides(masses, spectrum, int_mass)
+    matches  = genetics.matching_peptides(masses, spectrum)
 
     print ' '.join(set('-'.join(str(m) for m in match) for match in matches))
 
