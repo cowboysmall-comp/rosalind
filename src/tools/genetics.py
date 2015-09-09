@@ -175,7 +175,6 @@ def find_corrections_in_reads(reads):
     return corrections
 
 
-
 def assemble_genome_from_reads(reads):
     length = len(reads[0])
 
@@ -501,9 +500,7 @@ def check_occurences(rna):
     4) and just out of interest, here is a version, based on a 
     version written in Ruby that I found in the forums, and 
     translated into Python. It is much slower, but I find it 
-    fascinating. For some reason, examples of Dynamic Programming 
-    always tend to turn my brain inside out, and this example is no 
-    different in that respect.
+    fascinating.
 
         def perfect_matchings(rna):
             A = np.zeros((len(rna), len(rna)), dtype = int)
@@ -521,8 +518,6 @@ def check_occurences(rna):
             return A
 
 
-    I have no idea what's going on here :-)
-
 """
 
 def perfect_matchings(rna):
@@ -537,6 +532,7 @@ def perfect_matchings(rna):
                 for i in xrange(1, len(rna), 2):
                     if rna[0] == RNA_COMPLEMENT[rna[i]]:
                         A[rna] += match(rna[1:i]) * match(rna[i + 1:])
+                        A[rna] %= 1000000
 
         return A[rna]
 
@@ -555,6 +551,7 @@ def matchings(rna):
             for i in xrange(1, len(rna)):
                 if rna[0] == RNA_COMPLEMENT[rna[i]]:
                     A[rna] += match(rna[1:i]) * match(rna[i + 1:])
+                    A[rna] %= 1000000
 
         return A[rna]
 
@@ -767,8 +764,8 @@ def convolution_list(counts):
 
 def convolution_frequent(counts, M):
     ordered = sorted([(freq, mass) for mass, freq in counts.iteritems() if 57 <= mass <= 200], reverse = True)
+    value   = ordered[M][0]
 
-    value = ordered[M][0]
     while M < len(ordered) and ordered[M][0] == value:
         M += 1
 
@@ -776,17 +773,17 @@ def convolution_frequent(counts, M):
 
 
 def sigma_distance(kmer, strings):
-    k    = len(kmer)
     dist = 0
+    k    = len(kmer)
 
     for string in strings:
-        hamming = sys.maxint
-        length  = len(string)
+        hamming = []
+
+        length = len(string)
         for i in xrange(length - k + 1):
-            d = distance.hamming(kmer, string[i:i + k])
-            if hamming > d:
-                hamming = d
-        dist += hamming
+            hamming.append(distance.hamming(kmer, string[i:i + k]))
+
+        dist += min(hamming)
 
     return dist
 
