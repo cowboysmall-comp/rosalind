@@ -7,7 +7,7 @@ import genetics
 
 
 def main(argv):
-    print genetics.matchings(fasta.read_one(argv[0])) % 1000000
+    print genetics.matchings(fasta.read_one(argv[0]))
 
 
 if __name__ == "__main__":
