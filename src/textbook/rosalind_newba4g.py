@@ -10,14 +10,11 @@ import table
 def main(argv):
     int_mass = table.integer_mass(argv[0])
     lines    = files.read_lines_of_ints(argv[1])
+    masses   = [[value] for value in sorted(int_mass.values())]
 
-    M        = lines[0][0]
-    N        = lines[1][0]
-    spectrum = sorted(lines[2])
-
-    counts   = genetics.convolution_counts(spectrum)
-    masses   = genetics.convolution_frequent(counts, M)
-    match    = genetics.leaderboard_matching_peptides(masses, [0] + spectrum, N, int_mass)
+    N        = lines[0][0]
+    spectrum = lines[1]
+    match    = genetics.leaderboard_matching_peptides(masses, spectrum, N)
 
     print '-'.join(str(m) for m in match[1])
 

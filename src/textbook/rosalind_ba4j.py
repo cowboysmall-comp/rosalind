@@ -3,8 +3,8 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
-import genetics
 import table
+import genetics
 
 
 def main(argv):
@@ -12,7 +12,7 @@ def main(argv):
     peptide  = files.read_line(argv[1])
     masses   = [int_mass[p] for p in peptide]
 
-    print ' '.join(str(mass) for mass in genetics.cyclo_spectrum(masses, int_mass))
+    print ' '.join(str(m) for m in genetics.linear_spectrum(masses))
 
 
 if __name__ == "__main__":
