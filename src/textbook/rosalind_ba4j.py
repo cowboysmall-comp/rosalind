@@ -7,17 +7,6 @@ import table
 import genetics
 
 
-# def linear_spectrum(masses):
-#     length   = len(masses)
-#     spectrum = [0, sum(masses)]
-
-#     for i in xrange(1, length):
-#         for j in xrange(length - i + 1):
-#             spectrum.append(sum(masses[j:j + i]))
-
-#     return sorted(spectrum)
-
-
 def main(argv):
     int_mass = table.integer_mass(argv[0])
     peptide  = files.read_line(argv[1])
