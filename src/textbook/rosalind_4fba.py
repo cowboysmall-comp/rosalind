@@ -14,7 +14,7 @@ def main(argv):
 
     N        = lines[0][0]
     spectrum = lines[1]
-    match    = genetics.leaderboard_matching_peptides(masses, spectrum, N, int_mass)
+    match    = genetics.leaderboard_matching_peptides(masses, spectrum, N)
 
     print '-'.join(str(m) for m in match[1])
 

@@ -333,6 +333,24 @@ def two_break_distance(P, Q):
     return sum(len(g) for g in P) - len(components)
 
 
+def two_break_on_genome_graph(edges, i1, i2, j1, j2):
+    if (i1, i2) in edges or (i2, i1) in edges and (j1, j2) in edges or (j2, j1) in edges:
+
+        if (i1, i2) in edges:
+            edges.remove((i1, i2))
+            edges.append((i1, j1))
+        else:
+            edges.remove((i2, i1))
+            edges.append((j1, i1))
+
+        if (j1, j2) in edges:
+            edges.remove((j1, j2))
+            edges.append((i2, j2))
+        else:
+            edges.remove((j2, j1))
+            edges.append((j2, i2))
+
+    return edges
 
 
 
