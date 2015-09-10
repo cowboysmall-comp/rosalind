@@ -687,6 +687,41 @@ def linear_spectrum(masses):
     return sorted(spectrum)
 
 
+def linear_score(masses, spectrum):
+    counts = defaultdict(int)
+    theory = linear_spectrum(masses)
+    score  = 0
+
+    for s in spectrum:
+        counts[s] += 1
+
+    for m in theory:
+        if m in counts and counts[m] > 0:
+            score     += 1
+            counts[m] -= 1
+
+    return score
+
+
+def trim_leaderboard(leaderboard, spectrum, N):
+    leaders = []
+
+    for leader in leaderboard:
+        leaders.append((linear_score(leader[0], spectrum), leader))
+
+    leaders = sorted(leaders, reverse = True)
+    cutoff  = leaders[N][0]
+    pos     = N
+
+    for i in xrange(N + 1, len(leaderboard)):
+        if leaders[i][0] < cutoff:
+            break
+        else:
+            pos += 1
+
+    return [leader[1] for leader in leaders[:pos]]
+
+
 def matching_peptides(masses, spectrum):
     candidates = masses[:]
     matches    = []
