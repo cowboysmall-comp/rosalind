@@ -324,6 +324,7 @@ def graph_to_genome(edges):
 def two_break_distance(P, Q):
     edges      = set()
     for genome in [P, Q]:
+
         for edge in colored_edges(genome):
             edges.add(edge)
 
@@ -351,6 +352,14 @@ def two_break_on_genome_graph(edges, i1, i2, j1, j2):
             edges.append((j2, i2))
 
     return edges
+
+
+def two_break_on_genome(P, i1, i2, j1, j2):
+    edges = black_edges(len(P)) + colored_edges(P)
+    edges = two_break_on_genome_graph(edges, i1, i2, j1, j2)
+
+    return graph_to_genome(edges)
+
 
 
 
