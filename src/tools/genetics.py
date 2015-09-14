@@ -1143,7 +1143,7 @@ def ordered_edges(length):
     return [((2 * i) - 1, 2 * i) for i in xrange(1, length + 1)]
 
 
-def colored_edges(genome):
+def colored_edges_from_genome(genome):
     edges = []
 
     for chromosome in genome:
@@ -1273,7 +1273,7 @@ def two_break_distance(P, Q):
     edges      = set()
 
     for genome in [P, Q]:
-        for edge in colored_edges(genome):
+        for edge in colored_edges_from_genome(genome):
             edges.add(edge)
 
     # nodes      = graphs.nodes_from_edges(edges)
@@ -1320,7 +1320,7 @@ def full_graph_to_genome(edges):
 
 
 def two_break_on_genome(P, i1, i2, j1, j2):
-    edges = black_edges_from_genome([P]) + colored_edges([P])
+    edges = black_edges_from_genome([P]) + colored_edges_from_genome([P])
     edges = two_break_on_genome_graph(edges, i1, i2, j1, j2)
 
     return full_graph_to_genome(edges)

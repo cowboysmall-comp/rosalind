@@ -10,7 +10,7 @@ def main(argv):
     line   = files.read_line(argv[0])
     genome = [[int(val) for val in chromosome.split(' ')] for chromosome in line[1:-1].split(')(')]
 
-    print ', '.join(str(c) for c in genetics.colored_edges(genome))
+    print ', '.join(str(c) for c in genetics.colored_edges_from_genome(genome))
 
 
 if __name__ == "__main__":
