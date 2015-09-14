@@ -11,7 +11,6 @@ def main(argv):
     genome = [[int(val) for val in chromosome.split(' ')] for chromosome in line[1:-1].split(')(')]
 
     print ', '.join(str(c) for c in sorts.colored_edges(genome))
-    print ', '.join(str(c) for c in sorts.black_edges(genome))
 
 
 if __name__ == "__main__":

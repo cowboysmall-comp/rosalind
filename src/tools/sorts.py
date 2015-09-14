@@ -2,6 +2,8 @@ import permutations
 import arrays
 import graphs
 
+from collections import defaultdict
+
 
 '''
     the recursive version of merge fails on larger arrays, so I 
