@@ -10,7 +10,7 @@ def main(argv):
     line  = files.read_line(argv[0])
     perm  = [int(val) for val in line[1:-1].split(' ')]
 
-    print sorts.breakpoints(perm)
+    print sorts.count_signed_breaks(perm)
 
 
 if __name__ == "__main__":
