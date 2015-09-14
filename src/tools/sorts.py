@@ -2,6 +2,8 @@ import permutations
 import arrays
 import graphs
 
+from collections import defaultdict
+
 
 '''
     the recursive version of merge fails on larger arrays, so I 
@@ -260,7 +262,7 @@ def colored_edges(genome):
     return edges
 
 
-def black_edges(length):
+def ordered_edges(length):
     return [((2 * i) - 1, 2 * i) for i in xrange(1, length + 1)]
 
 
@@ -268,7 +270,7 @@ def get_cycles(edges):
     cycles = []
     cycle  = []
 
-    for pair in zip(black_edges(len(edges)), edges):
+    for pair in zip(ordered_edges(len(edges)), edges):
         if pair[0][0] in pair[1]:
             if pair[0][1] not in cycle:
                 cycle.append(pair[0][1])
@@ -354,11 +356,58 @@ def two_break_on_genome_graph(edges, i1, i2, j1, j2):
     return edges
 
 
+
+
+
+
+
+
+def black_edges_from_genome(genome):
+    edges = []
+
+    for chromosome in genome:
+        nodes  = chromosome_to_cycle(chromosome)
+        length = len(nodes)
+        for j in xrange(len(chromosome)):
+            edges.append((nodes[(2 * j)], nodes[(2 * j) + 1]))
+
+    return edges
+
+
+def black_edges_from_coloured_edges(edges):
+    length = len(edges)
+    black  = []
+
+    for i in xrange(length):
+        black.append((edges[(length - 1 + i) % length][1], edges[(length + i) % length][0]))
+
+    return black
+
+
+
+
+
+
+
+
+def full_graph_to_genome(edges):
+    chromosomes = []
+    nodes       = sorted(graphs.nodes_from_edges(edges))
+
+    for cycle in graphs.connected_components(nodes, edges):
+        chromosomes.append(cycle_to_chromosome(cycle))
+
+    return chromosomes
+
+
 def two_break_on_genome(P, i1, i2, j1, j2):
-    edges = black_edges(len(P)) + colored_edges(P)
+    edges = black_edges_from_genome([P]) + colored_edges([P])
     edges = two_break_on_genome_graph(edges, i1, i2, j1, j2)
 
-    return graph_to_genome(edges)
+    return full_graph_to_genome(edges)
+
+
+
 
 
 
