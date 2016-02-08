@@ -687,6 +687,41 @@ def linear_spectrum(masses):
     return sorted(spectrum)
 
 
+def linear_score(masses, spectrum):
+    counts = defaultdict(int)
+    theory = linear_spectrum(masses)
+    score  = 0
+
+    for s in spectrum:
+        counts[s] += 1
+
+    for m in theory:
+        if m in counts and counts[m] > 0:
+            score     += 1
+            counts[m] -= 1
+
+    return score
+
+
+def trim_leaderboard(leaderboard, spectrum, N):
+    leaders = []
+
+    for leader in leaderboard:
+        leaders.append((linear_score(leader[0], spectrum), leader))
+
+    leaders = sorted(leaders, reverse = True)
+    cutoff  = leaders[N][0]
+    pos     = N
+
+    for i in xrange(N + 1, len(leaderboard)):
+        if leaders[i][0] < cutoff:
+            break
+        else:
+            pos += 1
+
+    return [leader[1] for leader in leaders[:pos]]
+
+
 def matching_peptides(masses, spectrum):
     candidates = masses[:]
     matches    = []
@@ -1094,4 +1129,201 @@ def find_peptides_in_dna(dna, amino, table):
             chunks.append(chunk)
 
     return chunks
+
+
+
+
+
+
+
+
+
+
+def ordered_edges(length):
+    return [((2 * i) - 1, 2 * i) for i in xrange(1, length + 1)]
+
+
+def colored_edges_from_genome(genome):
+    edges = []
+
+    for chromosome in genome:
+        nodes  = chromosome_to_cycle(chromosome)
+        length = len(nodes)
+        for j in xrange(1, len(chromosome) + 1):
+            edges.append((nodes[((2 * j) - 1) % length], nodes[(2 * j) % length]))
+
+    return edges
+
+
+def black_edges_from_genome(genome):
+    edges = []
+
+    for chromosome in genome:
+        nodes  = chromosome_to_cycle(chromosome)
+        length = len(nodes)
+        for j in xrange(len(chromosome)):
+            edges.append((nodes[(2 * j)], nodes[(2 * j) + 1]))
+
+    return edges
+
+
+def black_edges_from_coloured_edges(edges):
+    length = len(edges)
+    black  = []
+
+    for i in xrange(length):
+        black.append((edges[(length - 1 + i) % length][1], edges[(length + i) % length][0]))
+
+    return black
+
+
+
+
+def chromosome_to_cycle(chromosome):
+    nodes = [None] * (2 * len(chromosome))
+
+    for j in xrange(1, len(chromosome) + 1):
+        i = chromosome[j - 1]
+        if i > 0:
+            nodes[(2 * j) - 2] =  (2 * i) - 1
+            nodes[(2 * j) - 1] =  (2 * i)
+        else:
+            nodes[(2 * j) - 2] = -(2 * i)
+            nodes[(2 * j) - 1] = -(2 * i) - 1
+
+    return nodes
+
+
+def cycle_to_chromosome(nodes):
+    chromosome = [None] * (len(nodes) // 2)
+
+    for j in xrange(1, (len(nodes) // 2) + 1):
+        if nodes[(2 * j) - 2] < nodes[(2 * j) - 1]:
+            chromosome[j - 1] = nodes[(2 * j) - 1] / 2
+        else:
+            chromosome[j - 1] = -nodes[(2 * j) - 2] / 2
+
+    return chromosome
+
+
+
+
+def get_cycles(edges):
+    cycles = []
+    cycle  = []
+
+    for pair in zip(ordered_edges(len(edges)), edges):
+        if pair[0][0] in pair[1]:
+            if pair[0][1] not in cycle:
+                cycle.append(pair[0][1])
+            cycle.append(pair[0][0])
+        else:
+            if pair[0][0] not in cycle:
+                cycle.append(pair[0][0])
+            cycle.append(pair[0][1])
+
+        if pair[1][1] in cycle:
+            cycles.append(cycle)
+            cycle = []
+        else:
+            cycle.append(pair[1][1])
+
+    return cycles
+
+
+'''
+    a version that doesn't use cycle_to_chromosome
+
+    def graph_to_genome(edges):
+        chromosomes = []
+        chromosome  = []
+        seen        = set()
+
+        for i, pair in enumerate(zip(ordered_edges(len(edges)), edges)):
+            if pair[0][1] in pair[1]:
+                chromosome.append(i + 1)
+            else:
+                chromosome.append(-(i + 1))
+
+            if pair[1][1] in seen:
+                chromosomes.append(chromosome)
+                chromosome = []
+            else:
+                seen.add(pair[0][0])
+                seen.add(pair[0][1])
+
+        return chromosomes
+
+'''
+
+def graph_to_genome(edges):
+    chromosomes = []
+
+    # nodes      = graphs.nodes_from_edges(edges)
+    # components = graphs.connected_components(nodes, edges)
+
+    for cycle in get_cycles(edges):
+        chromosomes.append(cycle_to_chromosome(cycle))
+
+    return chromosomes
+
+
+
+def two_break_distance(P, Q):
+    edges      = set()
+
+    for genome in [P, Q]:
+        for edge in colored_edges_from_genome(genome):
+            edges.add(edge)
+
+    # nodes      = graphs.nodes_from_edges(edges)
+    # components = graphs.connected_components(nodes, edges, False)
+
+    adjacency  = graphs.adjacency_table(edges, False)
+    components = graphs.connected_components_iterative(adjacency)
+
+    return sum(len(g) for g in P) - len(components)
+
+
+def two_break_on_genome_graph(edges, i1, i2, j1, j2):
+    if (i1, i2) in edges:
+        edges.remove((i1, i2))
+        edges.append((i1, j1))
+    else:
+        edges.remove((i2, i1))
+        edges.append((j1, i1))
+
+    if (j1, j2) in edges:
+        edges.remove((j1, j2))
+        edges.append((i2, j2))
+    else:
+        edges.remove((j2, j1))
+        edges.append((i2, j2))
+
+    return edges
+
+
+
+
+def full_graph_to_genome(edges):
+    chromosomes = []
+
+    nodes       = sorted(graphs.nodes_from_edges(edges))
+    for cycle in graphs.connected_components(nodes, edges):
+        chromosomes.append(cycle_to_chromosome(cycle))
+
+    # adjacency  = graphs.adjacency_table(edges, False)
+    # for cycle in graphs.connected_components_iterative(adjacency):
+    #     chromosomes.append(cycle_to_chromosome(list(cycle)))
+
+    return chromosomes
+
+
+def two_break_on_genome(P, i1, i2, j1, j2):
+    edges = black_edges_from_genome([P]) + colored_edges_from_genome([P])
+    edges = two_break_on_genome_graph(edges, i1, i2, j1, j2)
+
+    return full_graph_to_genome(edges)
+
+
 

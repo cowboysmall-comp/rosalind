@@ -4,7 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../tools'))
 
 import files
 import permutations
-import sorts
+import genetics
 
 
 def two_break_sort(P, Q):
